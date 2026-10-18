@@ -1,0 +1,1880 @@
+<style>
+.pd {
+  --pd-accent: var(--color-fg);
+  --pd-fs-table: calc((var(--cds-font-size-caption) + var(--cds-font-size-body)) / 2);
+  container: pd / inline-size;
+  font-family: var(--font-anthropic-sans);
+  font-size: var(--cds-font-size-body);
+  color: var(--color-fg);
+  line-height: 1.45;
+  max-width: 82rem;
+  margin-inline: auto;
+}
+.pd *, .pd *::before, .pd *::after { box-sizing: border-box; }
+.pd [hidden] { display: none !important; }
+.pd h1, .pd h2, .pd h3, .pd h4, .pd h5, .pd h6, .pd p, .pd ul, .pd ol, .pd dl, .pd dd { margin: 0; }
+.pd button, .pd input { font: inherit; color: inherit; }
+.pd a { color: inherit; text-underline-offset: 2px; }
+.pd :focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+.pd .pd-dim { color: var(--color-fg-muted); }
+.pd .pos { color: var(--color-ok); }
+.pd .neg { color: var(--color-bad); }
+.pd .pd-pre { white-space: pre-line; overflow-wrap: anywhere; }
+
+/* header and tabs */
+.pd .pd-head { display: flex; flex-direction: column; gap: var(--cds-gap-xs); margin-bottom: var(--cds-gap-md); }
+.pd .pd-title { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); letter-spacing: -0.01em; line-height: 1.2; }
+.pd .pd-takeaway { color: var(--color-fg-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 1.45em; }
+.pd .pd-takeaway.pd-failed { display: flex; justify-content: flex-start; }
+.pd .pd-tabs { display: flex; gap: var(--cds-gap-xs); border-bottom: 1px solid var(--color-border-line); overflow-x: auto; margin-bottom: var(--cds-gap-lg); }
+.pd .pd-tab { appearance: none; background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; color: var(--color-fg-muted); font-weight: var(--cds-font-weight-medium); padding: var(--cds-pad-sm) var(--cds-pad-md); cursor: pointer; white-space: nowrap; }
+.pd .pd-tab:hover { color: var(--color-fg); }
+.pd .pd-tab[aria-selected="true"] { color: var(--color-fg); border-bottom-color: var(--pd-accent); }
+.pd .pd-panel[hidden] { display: none; }
+.pd .pd-stack { display: flex; flex-direction: column; gap: var(--cds-gap-lg); }
+.pd .pd-foot { margin-top: var(--cds-gap-xl); color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+
+/* cards */
+.pd .pd-card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); min-width: 0; }
+.pd .pd-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--cds-gap-md); flex-wrap: wrap; margin-bottom: var(--cds-gap-md); }
+.pd .pd-h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); line-height: 1.3; }
+.pd .pd-h3 { font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); margin-bottom: var(--cds-gap-xs); }
+.pd .pd-note { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); margin-top: 2px; }
+.pd .pd-mt-md { margin-top: var(--cds-gap-md); }
+.pd .pd-mt-sm { margin-top: var(--cds-gap-sm); }
+.pd .pd-empty { color: var(--color-fg-muted); padding: var(--cds-pad-sm) 0; }
+.pd .pd-box { min-height: 4rem; }
+.pd .pd-failed { display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.pd .pd-failed::before { content: ""; width: 0.375rem; height: 0.375rem; border-radius: 50%; background: var(--color-bad); flex: none; }
+.pd .pd-link { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); white-space: nowrap; }
+.pd .pd-link:hover { color: var(--color-fg); }
+.pd .pd-btn { appearance: none; background: transparent; border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); cursor: pointer; }
+.pd .pd-btn:hover { background: color-mix(in srgb, var(--color-fg) 6%, transparent); }
+.pd .pd-btn[aria-pressed="true"] { background: color-mix(in srgb, var(--pd-accent) 14%, transparent); border-color: var(--pd-accent); }
+.pd .pd-input { background: var(--color-bg); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-xs) var(--cds-pad-sm); min-width: 0; width: 100%; font-variant-numeric: tabular-nums; }
+.pd .pd-card-head .pd-input { width: 13rem; }
+.pd .pd-chip { display: inline-flex; align-items: center; gap: 6px; font-size: var(--cds-font-size-caption); line-height: 1.2; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--color-border-line); white-space: nowrap; }
+.pd .pd-chip.muted { color: var(--color-fg-muted); }
+.pd .pd-chip.ok { color: var(--color-ok); border-color: color-mix(in srgb, var(--color-ok) 45%, transparent); background: color-mix(in srgb, var(--color-ok) 10%, transparent); }
+.pd .pd-chip.bad { color: var(--color-bad); border-color: color-mix(in srgb, var(--color-bad) 45%, transparent); background: color-mix(in srgb, var(--color-bad) 10%, transparent); }
+.pd .pd-chip.warn { color: var(--color-warn); border-color: color-mix(in srgb, var(--color-warn) 50%, transparent); background: color-mix(in srgb, var(--color-warn) 12%, transparent); }
+.pd .pd-chip.tag::before { content: ""; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--chip, var(--color-fg-muted)); flex: none; }
+
+/* figures */
+.pd .pd-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11.5rem), 1fr)); gap: var(--cds-gap-md); }
+.pd .pd-kpi { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md) var(--cds-pad-lg); display: flex; flex-direction: column; gap: 4px; min-width: 0; min-height: 6.5rem; }
+.pd .pd-kpi.wide { grid-column: 1 / -1; }
+.pd .pd-kpi-label { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.pd .pd-kpi-value { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); line-height: 1.15; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.pd .pd-kpi-sub { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+.pd .pd-kpi-sub .pos { color: var(--color-ok); }
+.pd .pd-kpi-sub .neg { color: var(--color-bad); }
+
+/* regime and pulse */
+.pd .pd-regime { display: flex; gap: var(--cds-gap-lg); flex-wrap: wrap; align-items: flex-start; justify-content: space-between; }
+.pd .pd-regime-main { flex: 1 1 18rem; min-width: 0; display: flex; flex-direction: column; gap: var(--cds-gap-sm); }
+.pd .pd-regime-top { display: flex; align-items: center; gap: var(--cds-gap-sm); flex-wrap: wrap; color: var(--color-fg-muted); }
+.pd .pd-regime-regime { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); }
+.pd .pd-regime-headline { color: var(--color-fg-muted); }
+.pd .pd-stat { flex: none; display: flex; flex-direction: column; gap: 2px; min-width: 6rem; }
+.pd .pd-stat-n { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.pd .pd-key { border-left: 3px solid var(--pd-accent); background: color-mix(in srgb, var(--pd-accent) 9%, var(--color-panel)); border-radius: 0 var(--cds-radius) var(--cds-radius) 0; padding: var(--cds-pad-md) var(--cds-pad-lg); margin-bottom: var(--cds-gap-md); }
+.pd .pd-key-t { font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); margin-bottom: var(--cds-gap-xs); }
+.pd .pd-clip { max-height: 28rem; overflow: hidden; position: relative; }
+.pd .pd-clip.open { max-height: none; }
+.pd .pd-clip.is-clipped:not(.open)::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3.5rem; background: linear-gradient(to bottom, transparent, var(--color-panel)); pointer-events: none; }
+.pd .pd-clip + .pd-btn { margin-top: var(--cds-gap-sm); }
+
+/* rendered notion text */
+.pd .nr { overflow-wrap: anywhere; }
+.pd .nr h3 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 1.1em 0 0.35em; }
+.pd .nr h4 { font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); margin: 1em 0 0.3em; }
+.pd .nr h5, .pd .nr h6 { font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); margin: 0.9em 0 0.25em; }
+.pd .nr > :first-child { margin-top: 0; }
+.pd .nr p { margin: 0.4em 0; }
+.pd .nr ul, .pd .nr ol { margin: 0.25em 0 0.25em 1.25em; padding: 0; }
+.pd .nr li { margin: 0.15em 0; }
+.pd .nr hr { border: 0; border-top: 1px solid var(--color-border-line); margin: 0.8em 0; }
+.pd .nr blockquote { margin: 0.4em 0; padding-left: 0.8em; border-left: 3px solid var(--color-border-line); color: var(--color-fg-muted); }
+.pd .nr code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; background: color-mix(in srgb, var(--color-fg) 7%, transparent); padding: 0 4px; border-radius: 4px; }
+.pd .nr .nr-pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: var(--cds-font-size-caption); background: color-mix(in srgb, var(--color-fg) 6%, transparent); padding: var(--cds-pad-sm); border-radius: var(--cds-radius); overflow-x: auto; white-space: pre; margin: 0.5em 0; }
+.pd .nr .nr-callout, .pd .nr .nr-details { background: color-mix(in srgb, var(--color-fg) 5%, transparent); border-radius: var(--cds-radius); padding: var(--cds-pad-xs) var(--cds-pad-md); margin: 0.6em 0; }
+.pd .nr .nr-summary { font-weight: var(--cds-font-weight-medium); }
+.pd .nr strong { font-weight: 600; }
+.pd .nr .nr-tw { overflow-x: auto; margin: 0.6em 0; }
+.pd .nr table { border-collapse: collapse; min-width: 100%; font-size: var(--pd-fs-table); font-variant-numeric: tabular-nums; }
+.pd .nr th, .pd .nr td { border: 1px solid var(--color-border-line); padding: 4px 8px; text-align: left; vertical-align: top; }
+.pd .nr th { background: color-mix(in srgb, var(--color-fg) 6%, transparent); font-weight: var(--cds-font-weight-medium); }
+
+/* setups */
+.pd .pd-setups { display: grid; gap: var(--cds-gap-md); }
+.pd .pd-setup { border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); background: var(--color-bg); padding: var(--cds-pad-md) var(--cds-pad-lg); display: flex; flex-direction: column; gap: var(--cds-gap-sm); min-width: 0; }
+.pd .pd-setup-head { display: flex; align-items: center; gap: var(--cds-gap-sm); flex-wrap: wrap; }
+.pd .pd-setup-id { font-weight: 600; font-variant-numeric: tabular-nums; }
+.pd .pd-setup-meta { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.pd .pd-setup-inst { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; white-space: pre-line; }
+.pd .pd-blks { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: var(--cds-gap-md); }
+.pd .pd-blk { min-width: 0; }
+.pd .pd-blk-l { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); margin-bottom: 2px; }
+.pd .pd-blk-v { white-space: pre-line; overflow-wrap: anywhere; }
+.pd .pd-setup details { border-top: 1px solid var(--color-border-line); padding-top: var(--cds-pad-sm); }
+.pd .pd-setup summary { cursor: pointer; font-weight: var(--cds-font-weight-medium); font-size: var(--cds-font-size-caption); }
+.pd .pd-setup details > :not(summary) { margin-top: var(--cds-gap-sm); }
+
+/* day gate */
+.pd .pd-gate { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: var(--cds-gap-xl); }
+.pd .pd-gate-col { display: flex; flex-direction: column; gap: var(--cds-gap-md); min-width: 0; }
+.pd .pd-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr)); gap: var(--cds-gap-md); }
+.pd .pd-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.pd .pd-field label, .pd .pd-field .pd-lab { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.pd .pd-seg { display: flex; gap: var(--cds-gap-xs); }
+.pd .pd-seg .pd-btn { flex: 1; padding: var(--cds-pad-sm); }
+.pd .pd-toggles { display: flex; gap: var(--cds-gap-sm); flex-wrap: wrap; }
+.pd .pd-verdict { border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md) var(--cds-pad-lg); display: flex; flex-direction: column; gap: var(--cds-gap-xs); }
+.pd .pd-verdict-word { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); line-height: 1.2; color: var(--color-fg-muted); }
+.pd .pd-verdict[data-v="go"] { border-color: color-mix(in srgb, var(--color-ok) 55%, transparent); }
+.pd .pd-verdict[data-v="go"] .pd-verdict-word { color: var(--color-ok); }
+.pd .pd-verdict[data-v="skip"] { border-color: color-mix(in srgb, var(--color-bad) 55%, transparent); }
+.pd .pd-verdict[data-v="skip"] .pd-verdict-word { color: var(--color-bad); }
+.pd .pd-verdict-why { padding-left: 1.1em; }
+.pd .pd-verdict-why:empty { display: none; }
+.pd .pd-warn { color: var(--color-warn); font-size: var(--cds-font-size-caption); }
+.pd .pd-out { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); gap: var(--cds-gap-sm) var(--cds-gap-md); }
+.pd .pd-out dt { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.pd .pd-out dd { font-variant-numeric: tabular-nums; font-weight: var(--cds-font-weight-medium); }
+
+/* charts */
+.pd .pd-chart { position: relative; min-height: 8rem; }
+.pd .pd-chart svg { display: block; }
+.pd .pd-ct { font-family: var(--font-anthropic-sans); font-size: var(--cds-font-size-caption); fill: var(--color-fg-muted); }
+.pd .pd-ct.v { fill: var(--color-fg); font-variant-numeric: tabular-nums; }
+.pd .pd-row { outline: none; }
+.pd .pd-hit { fill: transparent; }
+.pd .pd-row:hover .pd-hit { fill: color-mix(in srgb, var(--color-fg) 6%, transparent); }
+.pd .pd-row:focus-visible .pd-hit { fill: color-mix(in srgb, var(--color-fg) 6%, transparent); stroke: var(--color-fg); stroke-width: 2; }
+.pd .pd-tip { position: absolute; z-index: 5; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); white-space: nowrap; }
+.pd .pd-tip-h { color: var(--cds-text-secondary); }
+.pd .pd-tip-l { display: flex; justify-content: space-between; gap: var(--cds-gap-md); font-variant-numeric: tabular-nums; }
+
+/* tables */
+.pd .pd-tablewrap { max-height: 32rem; overflow: auto; border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); background: var(--color-panel); }
+.pd .pd-tablewrap.short { max-height: 24rem; }
+.pd .pd-table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: var(--pd-fs-table); font-variant-numeric: tabular-nums; }
+.pd .pd-table th { position: sticky; top: 0; z-index: 2; background: var(--color-panel); border-bottom: 1px solid var(--color-border-line); text-align: left; padding: 0; white-space: nowrap; }
+.pd .pd-table td { padding: 6px 10px; border-bottom: 1px solid color-mix(in srgb, var(--color-border-line) 60%, transparent); white-space: nowrap; vertical-align: top; }
+.pd .pd-table tbody tr:last-child td { border-bottom: 0; }
+.pd .pd-table tbody tr:hover td { background: color-mix(in srgb, var(--color-fg) 4%, var(--color-panel)); }
+.pd .pd-table tbody tr.sel td { background: color-mix(in srgb, var(--pd-accent) 12%, var(--color-panel)); }
+.pd .pd-table tbody tr[tabindex] { cursor: pointer; }
+.pd .pd-table .num { text-align: right; }
+.pd .pd-table th.stick, .pd .pd-table td.stick { position: sticky; left: 0; background: var(--color-panel); }
+.pd .pd-table th.stick { z-index: 3; }
+.pd .pd-table td.stick { z-index: 1; font-weight: var(--cds-font-weight-medium); }
+.pd .pd-table td.wrapc { white-space: normal; min-width: 12rem; max-width: 26rem; }
+.pd .pd-sort { appearance: none; background: none; border: 0; cursor: pointer; width: 100%; text-align: inherit; padding: 8px 10px; color: var(--color-fg-muted); font-weight: var(--cds-font-weight-medium); white-space: nowrap; }
+.pd .pd-sort:hover { color: var(--color-fg); }
+.pd .pd-table th[aria-sort="ascending"] .pd-sort::after { content: " \2191"; }
+.pd .pd-table th[aria-sort="descending"] .pd-sort::after { content: " \2193"; }
+.pd .pd-table th[aria-sort="ascending"] .pd-sort, .pd .pd-table th[aria-sort="descending"] .pd-sort { color: var(--color-fg); }
+.pd .pd-table td.stale::after { content: "stale"; margin-left: 6px; font-size: var(--cds-font-size-caption); color: var(--color-warn); border: 1px solid color-mix(in srgb, var(--color-warn) 50%, transparent); border-radius: 999px; padding: 0 6px; }
+.pd .wcell { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+.pd .w-track { width: 3.5rem; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--color-fg) 10%, transparent); overflow: hidden; flex: none; }
+.pd .w-fill { display: block; height: 100%; background: var(--pd-accent); border-radius: 3px; }
+.pd .clamp { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; white-space: pre-line; overflow-wrap: anywhere; }
+.pd .clamp.c2 { -webkit-line-clamp: 2; }
+.pd .clamp.c3 { -webkit-line-clamp: 3; }
+.pd .clamp.open { display: block; overflow: visible; }
+
+/* proposals and waiting */
+.pd .pd-sublist { list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--cds-gap-md); margin-bottom: var(--cds-gap-lg); }
+.pd .pd-prop { border-left: 3px solid var(--color-border-line); padding-left: var(--cds-pad-md); display: flex; flex-direction: column; gap: 4px; }
+.pd .pd-prop-h { display: flex; align-items: center; gap: var(--cds-gap-sm); flex-wrap: wrap; }
+.pd .pd-gaps { padding-left: 1.2em; display: flex; flex-direction: column; gap: var(--cds-gap-xs); }
+
+/* research */
+.pd .pd-detail { margin-top: var(--cds-gap-md); border-top: 1px solid var(--color-border-line); padding-top: var(--cds-pad-md); display: flex; flex-direction: column; gap: var(--cds-gap-md); }
+.pd .pd-pipe { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12.5rem), 1fr)); gap: var(--cds-gap-md); align-items: start; }
+.pd .pd-col { background: var(--color-bg); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-sm); display: flex; flex-direction: column; gap: var(--cds-gap-sm); min-width: 0; min-height: 5rem; }
+.pd .pd-pipe.pd-failed { display: flex; }
+.pd .pd-col-head { display: flex; justify-content: space-between; align-items: baseline; font-weight: var(--cds-font-weight-medium); padding: 2px 4px; }
+.pd .pd-col-head .n { color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+.pd .pd-hcard { appearance: none; text-align: left; width: 100%; background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-sm) var(--cds-pad-md); cursor: pointer; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pd .pd-hcard:hover { border-color: var(--color-fg-muted); }
+.pd .pd-hcard[aria-pressed="true"] { border-color: var(--pd-accent); background: color-mix(in srgb, var(--pd-accent) 10%, var(--color-panel)); }
+.pd .pd-hcard-n { font-weight: var(--cds-font-weight-medium); overflow-wrap: anywhere; }
+.pd .pd-hcard-m { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+
+/* log */
+.pd .pd-logbar { display: flex; gap: var(--cds-gap-xs); flex-wrap: wrap; margin-bottom: var(--cds-gap-md); }
+.pd .pd-log { list-style: none; padding: 0; margin: 0 0 0 6px; border-left: 2px solid var(--color-border-line); }
+.pd .pd-log-item { position: relative; padding: 0 0 var(--cds-pad-lg) var(--cds-pad-lg); display: flex; flex-direction: column; gap: 4px; }
+.pd .pd-log-item::before { content: ""; position: absolute; left: -7px; top: 0.4em; width: 12px; height: 12px; border-radius: 50%; background: var(--chip, var(--color-fg-muted)); border: 2px solid var(--color-panel); }
+.pd .pd-log-top { display: flex; align-items: center; gap: var(--cds-gap-sm); flex-wrap: wrap; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+.pd .pd-log-top .pd-link { margin-left: auto; }
+.pd .pd-log-title { font-weight: var(--cds-font-weight-medium); overflow-wrap: anywhere; }
+.pd .pd-log-headline { overflow-wrap: anywhere; white-space: pre-line; }
+.pd .pd-log-regime { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.pd .pd-more { margin-top: var(--cds-gap-sm); }
+
+@container pd (max-width: 640px) {
+  .pd .hide-sm { display: none; }
+  .pd .pd-card { padding: var(--cds-pad-md); }
+  .pd .pd-card-head .pd-input { width: 100%; }
+  .pd .pd-table td.wrapc { min-width: 10rem; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes pd-in { from { opacity: 0; } to { opacity: 1; } }
+  .pd .pd-panel.pd-in { animation: pd-in var(--cds-dur-slow) var(--cds-ease-out); }
+}
+</style>
+
+<div class="pd" id="pd-app">
+  <header class="pd-head" id="pd-header">
+    <h1 class="pd-title" id="pd-title">Portfolio Desk</h1>
+    <p class="pd-takeaway dash-skeleton" id="pd-takeaway" data-source="latest_pulse">—</p>
+  </header>
+
+  <div class="pd-tabs" id="pd-tabs" role="tablist" aria-label="Sections">
+    <button class="pd-tab" id="tab-today" role="tab" type="button" aria-selected="true" aria-controls="today" data-tab="today">Today</button>
+    <button class="pd-tab" id="tab-portfolio" role="tab" type="button" aria-selected="false" aria-controls="portfolio" tabindex="-1" data-tab="portfolio">Portfolio</button>
+    <button class="pd-tab" id="tab-research" role="tab" type="button" aria-selected="false" aria-controls="research" tabindex="-1" data-tab="research">Trades &amp; research</button>
+    <button class="pd-tab" id="tab-log" role="tab" type="button" aria-selected="false" aria-controls="log" tabindex="-1" data-tab="log">Log</button>
+  </div>
+
+  <div id="pd-panels"></div>
+
+  <p class="pd-foot" id="pd-foot">Research for your own decisions, not advice. Source: Notion: Trading Research System, read live with your own Notion access.</p>
+
+  <!-- Today -->
+  <template id="tpl-today">
+    <section id="today" class="pd-panel" role="tabpanel" aria-labelledby="tab-today">
+      <div class="pd-stack">
+        <section id="regime-card" class="pd-card" aria-labelledby="regime-h">
+          <div class="pd-card-head">
+            <div>
+              <h2 class="pd-h2" id="regime-h">Market regime</h2>
+              <p class="pd-note">From the latest pre-market pulse.</p>
+            </div>
+            <a class="pd-link" id="regime-open" href="https://www.notion.so/" target="_blank" rel="noopener" hidden>Open in Notion</a>
+          </div>
+          <div id="regime-body" class="pd-box dash-skeleton"></div>
+        </section>
+
+        <section id="pulse-card" class="pd-card" aria-labelledby="pulse-h">
+          <div class="pd-card-head">
+            <div>
+              <h2 class="pd-h2" id="pulse-h">Pre-market pulse</h2>
+              <p class="pd-note">The full note, as written by the morning run.</p>
+            </div>
+          </div>
+          <div id="pulse-key" class="pd-key" hidden>
+            <h3 class="pd-key-t" id="pulse-key-h">What matters for me today</h3>
+            <div id="pulse-key-body" class="nr"></div>
+          </div>
+          <div id="pulse-box" class="pd-box nr pd-clip dash-skeleton" data-source="latest_pulse"></div>
+          <button id="pulse-toggle" class="pd-btn" type="button" aria-expanded="false" aria-controls="pulse-box" hidden>Show all</button>
+        </section>
+
+        <section id="open-setups" class="pd-card" aria-labelledby="open-setups-h">
+          <div class="pd-card-head">
+            <div>
+              <h2 class="pd-h2" id="open-setups-h">Open setups</h2>
+              <p class="pd-note">Frozen before the open and still proposed or entered. Check them against live prices during the day.</p>
+            </div>
+          </div>
+          <div id="open-setups-list" class="pd-box dash-skeleton" data-source="ledger"></div>
+        </section>
+
+        <section id="day-gate" class="pd-card" aria-labelledby="gate-h">
+          <div class="pd-card-head">
+            <div>
+              <h2 class="pd-h2" id="gate-h">Day gate</h2>
+              <p class="pd-note">Check the opening numbers before taking any intraday trade. Nothing here is saved.</p>
+            </div>
+          </div>
+          <div class="pd-gate">
+            <div class="pd-gate-col" id="gate-inputs">
+              <div class="pd-fields">
+                <div class="pd-field"><label for="gate-gap">NIFTY opening gap %</label><input id="gate-gap" class="pd-input" type="number" inputmode="decimal" step="any"></div>
+                <div class="pd-field"><label for="gate-vix">India VIX level</label><input id="gate-vix" class="pd-input" type="number" inputmode="decimal" step="any"></div>
+                <div class="pd-field"><label for="gate-vixmove">VIX move today %</label><input id="gate-vixmove" class="pd-input" type="number" inputmode="decimal" step="any"></div>
+              </div>
+              <div class="pd-toggles">
+                <button id="gate-event" class="pd-btn" type="button" aria-pressed="false">High-impact event 09:15–14:30</button>
+                <button id="gate-diverge" class="pd-btn" type="button" aria-pressed="false">Heavyweights diverging</button>
+              </div>
+              <div id="gate-verdict" class="pd-verdict" data-v="wait" role="status" aria-live="polite">
+                <div class="pd-verdict-word" id="gate-word">Enter the opening numbers</div>
+                <ul class="pd-verdict-why" id="gate-why"></ul>
+                <p class="pd-note" id="gate-vixnote" hidden></p>
+              </div>
+            </div>
+            <div class="pd-gate-col" id="size-helper">
+              <h3 class="pd-h3" id="size-h">Position size</h3>
+              <div class="pd-fields">
+                <div class="pd-field"><label for="size-risk">Max risk per trade (₹)</label><input id="size-risk" class="pd-input" type="number" inputmode="decimal" step="any" min="0"></div>
+                <div class="pd-field"><label for="size-entry">Entry</label><input id="size-entry" class="pd-input" type="number" inputmode="decimal" step="any" min="0"></div>
+                <div class="pd-field"><label for="size-stop">Stop</label><input id="size-stop" class="pd-input" type="number" inputmode="decimal" step="any" min="0"></div>
+                <div class="pd-field">
+                  <span class="pd-lab" id="size-dir-l">Direction</span>
+                  <div class="pd-seg" role="group" aria-labelledby="size-dir-l">
+                    <button id="size-long" class="pd-btn" type="button" aria-pressed="true">Long</button>
+                    <button id="size-short" class="pd-btn" type="button" aria-pressed="false">Short</button>
+                  </div>
+                </div>
+              </div>
+              <p class="pd-warn" id="size-warn" role="alert" hidden></p>
+              <dl class="pd-out" id="size-out">
+                <div><dt>Quantity</dt><dd id="size-qty">—</dd></div>
+                <div><dt>Position value</dt><dd id="size-val">—</dd></div>
+                <div><dt>Loss if stopped</dt><dd id="size-loss">—</dd></div>
+                <div><dt id="size-t1-l">T1, book half</dt><dd id="size-t1">—</dd></div>
+                <div><dt id="size-t2-l">T2, trail to cost</dt><dd id="size-t2">—</dd></div>
+              </dl>
+            </div>
+          </div>
+          <p class="pd-note pd-mt-md" id="gate-foot">These rules are a Hypothesis Lab entry, untested. Collateral is leveraged margin, not cash.</p>
+        </section>
+      </div>
+    </section>
+  </template>
+
+  <!-- Portfolio -->
+  <template id="tpl-portfolio">
+    <section id="portfolio" class="pd-panel" role="tabpanel" aria-labelledby="tab-portfolio">
+      <div class="pd-stack">
+        <div class="pd-kpis" id="portfolio-kpis">
+          <div class="pd-kpi wide" id="kpi-total">
+            <div class="pd-kpi-label">Total portfolio</div>
+            <div class="pd-kpi-value dash-skeleton" id="kpi-total-v" data-source="totals" data-field="total_inr" data-row="0">—</div>
+            <div class="pd-kpi-sub" id="kpi-total-s"></div>
+          </div>
+          <div class="pd-kpi" id="kpi-india">
+            <div class="pd-kpi-label">Upstox India book</div>
+            <div class="pd-kpi-value dash-skeleton" id="kpi-india-v" data-source="totals" data-field="india_value" data-row="0">—</div>
+            <div class="pd-kpi-sub" id="kpi-india-s"></div>
+          </div>
+          <div class="pd-kpi" id="kpi-us">
+            <div class="pd-kpi-label">INDmoney US book</div>
+            <div class="pd-kpi-value dash-skeleton" id="kpi-us-v" data-source="totals" data-field="us_value" data-row="0">—</div>
+            <div class="pd-kpi-sub" id="kpi-us-s"></div>
+          </div>
+          <div class="pd-kpi" id="kpi-else">
+            <div class="pd-kpi-label">Held elsewhere</div>
+            <div class="pd-kpi-value dash-skeleton" id="kpi-else-v" data-source="totals" data-field="elsewhere_value" data-row="0">—</div>
+            <div class="pd-kpi-sub" id="kpi-else-s"></div>
+          </div>
+          <div class="pd-kpi" id="kpi-ved">
+            <div class="pd-kpi-label">Vedanta group, share of India book</div>
+            <div class="pd-kpi-value dash-skeleton" id="kpi-ved-v" data-source="totals" data-field="vedanta_share_of_india" data-row="0">—</div>
+            <div class="pd-kpi-sub" id="kpi-ved-s"></div>
+          </div>
+          <div class="pd-kpi" id="kpi-top">
+            <div class="pd-kpi-label">Largest position, share of total</div>
+            <div class="pd-kpi-value dash-skeleton" id="kpi-top-v" data-source="totals" data-field="largest_share" data-row="0">—</div>
+            <div class="pd-kpi-sub" id="kpi-top-s"></div>
+          </div>
+        </div>
+
+        <section id="themes-card" class="pd-card" aria-labelledby="themes-h">
+          <div class="pd-card-head">
+            <div>
+              <h2 class="pd-h2" id="themes-h">Where the money is</h2>
+              <p class="pd-note" id="themes-note">Share of the whole portfolio by theme, every book in rupees at the day's dollar rate. The Vedanta tickers are one position, so they are one bar. The largest bar is highlighted.</p>
+            </div>
+          </div>
+          <div id="theme-chart" class="pd-chart dash-skeleton" data-source="by_theme"></div>
+        </section>
+
+        <section id="holdings-card" class="pd-card" aria-labelledby="holdings-h">
+          <div class="pd-card-head">
+            <div>
+              <h2 class="pd-h2" id="holdings-h">Holdings</h2>
+              <p class="pd-note">Values are in each stock's own currency. P&amp;L is current value against the amount invested.</p>
+            </div>
+            <input id="holdings-search" class="pd-input" type="search" placeholder="Search holdings" aria-label="Search holdings" autocomplete="off">
+          </div>
+          <div id="holdings-state" class="pd-box dash-skeleton"></div>
+          <div id="holdings-wrap" class="pd-tablewrap" role="region" aria-label="Holdings table" tabindex="0" hidden>
+            <table id="holdings-table" class="pd-table" data-source="portfolio" data-row-key="Ticker"></table>
+          </div>
+          <p id="holdings-empty" class="pd-empty" hidden>No holdings match that search.</p>
+        </section>
+
+        <section id="waiting-card" class="pd-card" aria-labelledby="waiting-h">
+          <div class="pd-card-head">
+            <div>
+              <h2 class="pd-h2" id="waiting-h">Waiting on you</h2>
+              <p class="pd-note">Classification proposals from the weekly review, and what the data cannot tell yet.</p>
+            </div>
+          </div>
+          <div id="waiting-body" class="pd-box dash-skeleton" data-source="portfolio"></div>
+        </section>
+
+        <section id="watch-card" class="pd-card" aria-labelledby="watch-h">
+          <div class="pd-card-head">
+            <div>
+              <h2 class="pd-h2" id="watch-h">Watchlist</h2>
+              <p class="pd-note">Not held. Click a catalyst to read all of it.</p>
+            </div>
+          </div>
+          <div id="watch-state" class="pd-box dash-skeleton"></div>
+          <div id="watch-wrap" class="pd-tablewrap short" role="region" aria-label="Watchlist table" tabindex="0" hidden>
+            <table id="watch-table" class="pd-table" data-source="portfolio" data-row-key="Ticker"></table>
+          </div>
+        </section>
+
+        <section id="collateral-card" class="pd-card" aria-labelledby="collateral-h">
+          <div class="pd-card-head">
+            <div>
+              <h2 class="pd-h2" id="collateral-h">Collateral and stress test</h2>
+              <p class="pd-note">Straight from the Notion page. Collateral is leveraged margin, not cash.</p>
+            </div>
+            <a class="pd-link" id="collateral-open" href="https://www.notion.so/" target="_blank" rel="noopener" hidden>Open in Notion</a>
+          </div>
+          <div id="collateral-body" class="pd-box nr pd-clip dash-skeleton" data-source="collateral"></div>
+          <button id="collateral-toggle" class="pd-btn" type="button" aria-expanded="false" aria-controls="collateral-body" hidden>Show all</button>
+        </section>
+      </div>
+    </section>
+  </template>
+
+  <!-- Trades and research -->
+  <template id="tpl-research">
+    <section id="research" class="pd-panel" role="tabpanel" aria-labelledby="tab-research">
+      <div class="pd-stack">
+        <section id="stats-section" aria-label="Setup record">
+          <div class="pd-kpis" id="stats-kpis">
+            <div class="pd-kpi" id="kpi-frozen">
+              <div class="pd-kpi-label">Setups frozen</div>
+              <div class="pd-kpi-value dash-skeleton" id="kpi-frozen-v" data-source="setup_stats" data-field="frozen" data-row="0">—</div>
+              <div class="pd-kpi-sub" id="kpi-frozen-s"></div>
+            </div>
+            <div class="pd-kpi" id="kpi-open">
+              <div class="pd-kpi-label">Open now</div>
+              <div class="pd-kpi-value dash-skeleton" id="kpi-open-v" data-source="setup_stats" data-field="open" data-row="0">—</div>
+              <div class="pd-kpi-sub" id="kpi-open-s"></div>
+            </div>
+            <div class="pd-kpi" id="kpi-trig">
+              <div class="pd-kpi-label">Triggered validly</div>
+              <div class="pd-kpi-value dash-skeleton" id="kpi-trig-v" data-source="setup_stats" data-field="triggered" data-row="0">—</div>
+              <div class="pd-kpi-sub" id="kpi-trig-s"></div>
+            </div>
+            <div class="pd-kpi" id="kpi-entered">
+              <div class="pd-kpi-label">Entered</div>
+              <div class="pd-kpi-value dash-skeleton" id="kpi-entered-v" data-source="setup_stats" data-field="entered" data-row="0">—</div>
+              <div class="pd-kpi-sub" id="kpi-entered-s"></div>
+            </div>
+            <div class="pd-kpi" id="kpi-avgr">
+              <div class="pd-kpi-label">Average theoretical R</div>
+              <div class="pd-kpi-value dash-skeleton" id="kpi-avgr-v" data-source="setup_stats" data-field="avg_theoretical_R" data-row="0">—</div>
+              <div class="pd-kpi-sub" id="kpi-avgr-s"></div>
+            </div>
+          </div>
+          <p class="pd-note pd-mt-sm" id="stats-note"></p>
+        </section>
+
+        <section id="ledger-card" class="pd-card" aria-labelledby="ledger-h">
+          <div class="pd-card-head">
+            <div>
+              <h2 class="pd-h2" id="ledger-h">Trading ledger</h2>
+              <p class="pd-note">Every setup is frozen before the open. Click a row to read its thesis, trigger and lessons.</p>
+            </div>
+          </div>
+          <div id="ledger-state" class="pd-box dash-skeleton"></div>
+          <div id="ledger-wrap" class="pd-tablewrap" role="region" aria-label="Trading ledger table" tabindex="0" hidden>
+            <table id="ledger-table" class="pd-table" data-source="ledger" data-row-key="Setup ID"></table>
+          </div>
+          <div id="ledger-detail" class="pd-detail" aria-live="polite"></div>
+        </section>
+
+        <section id="pipeline-card" class="pd-card" aria-labelledby="pipeline-h">
+          <div class="pd-card-head">
+            <div>
+              <h2 class="pd-h2" id="pipeline-h">Strategy pipeline</h2>
+              <p class="pd-note">Strategy hypotheses by stage. Click one to read the statement, evidence and decision log.</p>
+            </div>
+          </div>
+          <div id="pipe-board" class="pd-pipe pd-box dash-skeleton"></div>
+          <div id="pipe-detail" class="pd-detail" aria-live="polite"></div>
+        </section>
+
+        <section id="rejected-card" class="pd-card" aria-labelledby="rejected-h">
+          <div class="pd-card-head">
+            <div>
+              <h2 class="pd-h2" id="rejected-h">Rejected trades</h2>
+              <p class="pd-note">Trades passed on, and what the price did afterwards. Click a cell to read all of it.</p>
+            </div>
+          </div>
+          <div id="rej-state" class="pd-box dash-skeleton"></div>
+          <div id="rej-wrap" class="pd-tablewrap short" role="region" aria-label="Rejected trades table" tabindex="0" hidden>
+            <table id="rej-table" class="pd-table" data-source="lab" data-row-key="Name"></table>
+          </div>
+        </section>
+      </div>
+    </section>
+  </template>
+
+  <!-- Log -->
+  <template id="tpl-log">
+    <section id="log" class="pd-panel" role="tabpanel" aria-labelledby="tab-log">
+      <div class="pd-stack">
+        <section id="log-card" class="pd-card" aria-labelledby="log-h">
+          <div class="pd-card-head">
+            <div>
+              <h2 class="pd-h2" id="log-h">Pulse and review log</h2>
+              <p class="pd-note">Newest first. Weekly and monthly reviews come before the day's other notes.</p>
+            </div>
+          </div>
+          <div class="pd-logbar" id="log-filter" role="group" aria-label="Filter by type">
+            <button class="pd-btn" type="button" data-f="all" aria-pressed="true">All</button>
+            <button class="pd-btn" type="button" data-f="Pre-market pulse" aria-pressed="false">Pre-market</button>
+            <button class="pd-btn" type="button" data-f="Post-market review" aria-pressed="false">Post-market</button>
+            <button class="pd-btn" type="button" data-f="Weekly review" aria-pressed="false">Weekly</button>
+            <button class="pd-btn" type="button" data-f="Monthly IC" aria-pressed="false">Monthly</button>
+          </div>
+          <div id="log-list" class="pd-box dash-skeleton" data-source="pulse"></div>
+          <button id="log-more" class="pd-btn pd-more" type="button" hidden>Show more</button>
+        </section>
+      </div>
+    </section>
+  </template>
+</div>
+
+<script>
+/* ===== Loaders: Notion answers become rows ===== */
+const joinPages = async ({ answer, call, args }) => {
+  const parse = (x) => {
+    if (typeof x !== 'string') return x;
+    try { return JSON.parse(x); } catch (e) { throw new Error(x.slice(0, 400)); }
+  };
+  let a = parse(answer);
+  const rows = [];
+  let extra = 0;
+  for (;;) {
+    if (!a || !Array.isArray(a.results)) {
+      const m = a && (a.message || a.error || a.text);
+      throw new Error(typeof m === 'string' ? m : 'Notion returned no results' + (a && typeof a === 'object' ? ' (keys: ' + Object.keys(a).join(', ') + ')' : ''));
+    }
+    rows.push(...a.results);
+    if (!(a.has_more && a.next_cursor) || extra >= 5) break;
+    extra++;
+    a = parse(await call('notion-query-data-sources', { data: { ...args.data, start_cursor: a.next_cursor } }));
+  }
+  const columns = [];
+  for (const r of rows) for (const k of Object.keys(r)) if (!columns.includes(k)) columns.push(k);
+  return { data: rows, columns, cut: !!a.has_more };
+};
+['portfolio', 'ledger', 'lab', 'pulse'].forEach((id) => {
+  dash.loader(id, { description: 'Notion returns 100 rows a page; this joins the pages.', fn: joinPages });
+});
+
+dash.loader('latest_pulse', {
+  description: 'Finds the newest pre-market pulse and reads its page.',
+  fn: async ({ answer, call, args }) => {
+    const parse = (x) => {
+      if (typeof x !== 'string') return x;
+      try { return JSON.parse(x); } catch (e) { throw new Error(x.slice(0, 400)); }
+    };
+    let a = parse(answer);
+    const rows = [];
+    let extra = 0;
+    for (;;) {
+      if (!a || !Array.isArray(a.results)) {
+        const m = a && (a.message || a.error || a.text);
+        throw new Error(typeof m === 'string' ? m : 'Notion returned no results' + (a && typeof a === 'object' ? ' (keys: ' + Object.keys(a).join(', ') + ')' : ''));
+      }
+      rows.push(...a.results);
+      if (!(a.has_more && a.next_cursor) || extra >= 5) break;
+      extra++;
+      a = parse(await call('notion-query-data-sources', { data: { ...args.data, start_cursor: a.next_cursor } }));
+    }
+    const pre = rows.filter((r) => r.Type === 'Pre-market pulse');
+    if (!pre.length) return [];
+    const day = (r) => String(r['date:Date:start'] || '');
+    let best = pre[0];
+    for (const r of pre.slice(1)) {
+      if (day(r) > day(best) || (day(r) === day(best) && String(r.createdTime || '') > String(best.createdTime || ''))) best = r;
+    }
+    let page = await call('notion-fetch', { id: best.url });
+    if (typeof page === 'string') {
+      try { const p = JSON.parse(page); if (p && typeof p === 'object') page = p; } catch (e) { /* plain text page */ }
+    }
+    const text = typeof page === 'string' ? page : page && page.text;
+    if (typeof text !== 'string') {
+      const m = page && (page.message || page.error);
+      throw new Error(typeof m === 'string' ? m : 'The pulse page came back without text');
+    }
+    const i = text.indexOf('<content>');
+    const j = text.lastIndexOf('</content>');
+    const body = (i >= 0 && j > i ? text.slice(i + 9, j) : text).trim();
+    return [{
+      Title: best.Title,
+      Date: best['date:Date:start'],
+      Headline: best.Headline,
+      Regime: best.Regime,
+      'Setups proposed': best['Setups proposed'],
+      url: best.url,
+      Body: body,
+    }];
+  },
+});
+
+dash.loader('collateral', {
+  description: 'Reads the Collateral and Stress Test page body.',
+  fn: ({ answer }) => {
+    let a = answer;
+    if (typeof a === 'string') {
+      try { const p = JSON.parse(a); if (p && typeof p === 'object') a = p; } catch (e) { throw new Error(a.slice(0, 400)); }
+    }
+    if (!a || typeof a.text !== 'string') {
+      const m = a && (a.message || a.error);
+      throw new Error(typeof m === 'string' ? m : 'The page came back without text');
+    }
+    const i = a.text.indexOf('<content>');
+    const j = a.text.lastIndexOf('</content>');
+    const body = (i >= 0 && j > i ? a.text.slice(i + 9, j) : a.text).trim();
+    return [{ Title: a.title, url: a.url, Body: body }];
+  },
+});
+
+/* ===== Calcs ===== */
+dash.calc('totals', {
+  title: 'Portfolio totals',
+  description: 'Books, P&L, Vedanta share and largest position from Holding rows and the USD/INR rate.',
+  inputs: ['portfolio', 'fx'],
+  fn: (portfolio, fx) => {
+    const n = (v) => (v === null || v === undefined || v === '' || !isFinite(Number(v)) ? 0 : Number(v));
+    const rate = n(fx[0] && fx[0].rate);
+    const held = portfolio.filter((r) => r.Status === 'Holding');
+    const sum = (list, k) => list.reduce((s, r) => s + n(r[k]), 0);
+    const inr = (r) => n(r['Current value']) * (r.Currency === 'USD' ? rate : 1);
+    const acct = (a) => held.filter((r) => r.Account === a);
+    const india = acct('Upstox'), us = acct('INDmoney'), other = acct('Other / not shown');
+    const iv = sum(india, 'Current value'), ii = sum(india, 'Invested');
+    const uv = sum(us, 'Current value'), ui = sum(us, 'Invested');
+    const ov = sum(other, 'Current value');
+    const total = iv + (uv + ov) * rate;
+    const ved = held.filter((r) => r.Theme === 'Vedanta cluster');
+    const vv = ved.reduce((s, r) => s + inr(r), 0);
+    const pos = {};
+    held.forEach((r) => {
+      const k = r.Theme === 'Vedanta cluster' ? 'Vedanta group (' + ved.length + ')' : r.Ticker;
+      pos[k] = (pos[k] || 0) + inr(r);
+    });
+    const top = Object.entries(pos).sort((a, b) => b[1] - a[1])[0] || ['', 0];
+    return [{
+      rate, asof: fx[0] && fx[0].asof, total_inr: total,
+      india_value: iv, india_invested: ii, india_pnl: iv - ii, india_pnl_pct: ii > 0 ? (iv - ii) / ii : null,
+      us_value: uv, us_invested: ui, us_pnl: uv - ui, us_pnl_pct: ui > 0 ? (uv - ui) / ui : null,
+      elsewhere_value: ov, elsewhere_tickers: other.map((r) => r.Ticker).join(', '),
+      vedanta_value: vv, vedanta_count: ved.length, vedanta_share_of_india: iv > 0 ? vv / iv : null,
+      largest_name: top[0], largest_value_inr: top[1], largest_share: total > 0 ? top[1] / total : null,
+    }];
+  },
+});
+
+dash.calc('by_theme', {
+  title: 'Value by theme',
+  description: 'Holdings grouped by theme in rupees (US at the dollar rate), largest first.',
+  inputs: ['portfolio', 'fx'],
+  fn: (portfolio, fx) => {
+    const rate = Number(fx[0] && fx[0].rate) || 0;
+    const t = {};
+    let all = 0;
+    portfolio.filter((r) => r.Status === 'Holding').forEach((r) => {
+      const v = (Number(r['Current value']) || 0) * (r.Currency === 'USD' ? rate : 1);
+      const k = r.Theme || 'Other';
+      t[k] = t[k] || { Theme: k, value_inr: 0, positions: 0 };
+      t[k].value_inr += v;
+      t[k].positions += 1;
+      all += v;
+    });
+    return Object.values(t)
+      .map((x) => ({ ...x, share: all > 0 ? x.value_inr / all : null }))
+      .sort((a, b) => b.value_inr - a.value_inr);
+  },
+});
+
+dash.calc('holdings_pnl', {
+  title: 'Holding P&L',
+  description: 'Current value divided by invested, minus one, per holding (a fraction).',
+  inputs: ['portfolio'],
+  fn: (portfolio) => portfolio
+    .filter((r) => r.Status === 'Holding' && Number(r.Invested) > 0 && r['Current value'] !== null && r['Current value'] !== undefined && isFinite(Number(r['Current value'])))
+    .map((r) => ({ Ticker: r.Ticker, pnl_pct: Number(r['Current value']) / Number(r.Invested) - 1 })),
+});
+
+dash.calc('data_gaps', {
+  title: 'Data gaps',
+  description: 'Counts of unverified pledges, holdings without a quantity, and pending classification proposals.',
+  inputs: ['portfolio'],
+  fn: (portfolio) => {
+    const held = portfolio.filter((r) => r.Status === 'Holding');
+    const unv = held.filter((r) => r.Market === 'India' && r.Pledged === 'Unverified');
+    const noq = held.filter((r) => r.Qty === undefined || r.Qty === null || r.Qty === '');
+    const prop = held.filter((r) => String(r['Thesis and notes'] || '').includes('PROPOSED ('));
+    return [{
+      unverified_pledged_india: unv.length, unverified_tickers: unv.map((r) => r.Ticker).join(', '),
+      no_qty: noq.length, no_qty_tickers: noq.map((r) => r.Ticker).join(', '),
+      proposals: prop.length,
+    }];
+  },
+});
+
+dash.calc('setup_stats', {
+  title: 'Setup record',
+  description: 'Counts and average R across frozen setups; scored means a theoretical R on a setup no longer Proposed.',
+  inputs: ['ledger'],
+  fn: (ledger) => {
+    const ok = (v) => v !== null && v !== undefined && v !== '' && isFinite(Number(v));
+    const scoredRows = ledger.filter((r) => ok(r['POST Theoretical R']) && r.Status !== 'Proposed');
+    const realRows = ledger.filter((r) => ok(r['POST Realized R']));
+    const sumT = scoredRows.reduce((s, r) => s + Number(r['POST Theoretical R']), 0);
+    const sumR = realRows.reduce((s, r) => s + Number(r['POST Realized R']), 0);
+    return [{
+      frozen: ledger.length,
+      open: ledger.filter((r) => r.Status === 'Proposed' || r.Status === 'Entered').length,
+      triggered: ledger.filter((r) => r['POST Trigger occurred'] === 'Yes').length,
+      entered: ledger.filter((r) => r['POST Trade entered'] === '__YES__').length,
+      scored: scoredRows.length,
+      sum_theoretical_R: sumT,
+      avg_theoretical_R: scoredRows.length ? sumT / scoredRows.length : null,
+      realized: realRows.length,
+      avg_realized_R: realRows.length ? sumR / realRows.length : null,
+    }];
+  },
+});
+
+dash.calc('lab_stages', {
+  title: 'Hypotheses by stage',
+  description: 'Strategy hypotheses counted per stage, in pipeline order; a hypothesis with no stage counts as Hypothesis.',
+  inputs: ['lab'],
+  fn: (lab) => ['Hypothesis', 'Testing', 'Validated', 'Active', 'Degraded', 'Retired'].map((s) => ({
+    Stage: s,
+    n: lab.filter((r) => r.Type === 'Strategy hypothesis' && (r.Stage || 'Hypothesis') === s).length,
+  })),
+});
+</script>
+
+<script>
+/* ===== Page code ===== */
+const $ = (id) => document.getElementById(id);
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined && text !== null) e.textContent = text;
+  return e;
+}
+const chip = (text, tone) => el('span', 'pd-chip' + (tone ? ' ' + tone : ''), text);
+const MINUS = '−';
+const IST_MS = 19800000;
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const CLASSES = ['Core / Hold-for-thesis', 'Tactical Swing', 'Intraday', 'Valuation Rotation Candidate', 'Watch', 'Unclassified'];
+const RULES = { gap: 1.2, vixMove: 8, vixLow: 11.5, vixMidLo: 12, vixMidHi: 18, vixHigh: 20, t1: 0.75, t2: 1.0 };
+const SCORED_MIN = 20;
+const STALE_DAYS = 3;
+const LOG_TYPES = { 'Pre-market pulse': 0, 'Post-market review': 1, 'Weekly review': 2, 'Monthly IC': 3 };
+const LOG_PRI = { 'Weekly review': 0, 'Monthly IC': 0, 'Post-market review': 1, 'Pre-market pulse': 2 };
+const TABS = ['today', 'portfolio', 'research', 'log'];
+const TAB_OF = {
+  today: 'today', 'regime-card': 'today', 'pulse-card': 'today', 'open-setups': 'today', 'day-gate': 'today',
+  portfolio: 'portfolio', 'themes-card': 'portfolio', 'holdings-card': 'portfolio', 'waiting-card': 'portfolio', 'watch-card': 'portfolio', 'collateral-card': 'portfolio',
+  research: 'research', 'ledger-card': 'research', 'pipeline-card': 'research', 'rejected-card': 'research',
+  log: 'log', 'log-card': 'log',
+};
+
+/* ---- data access ---- */
+const rowsOf = (id) => { const d = dash.data(id); return d && d.status === 'ok' && Array.isArray(d.data) ? d.data : []; };
+const oneOf = (id) => rowsOf(id)[0] || null;
+function stOf(...ids) {
+  const s = ids.map((i) => dash.data(i).status);
+  for (const k of ['error', 'missing', 'declined', 'connect', 'loading']) if (s.includes(k)) return k;
+  return s.find((x) => x !== 'ok') || 'ok';
+}
+const SIG = {};
+function once(key, sig, fn) { if (SIG[key] === sig) return; SIG[key] = sig; fn(); }
+function gateBox(box, st) {
+  box.classList.remove('dash-skeleton', 'pd-failed');
+  if (st === 'ok') return true;
+  SIG[box.id] = null;
+  box.replaceChildren();
+  if (st === 'loading') box.classList.add('dash-skeleton');
+  else if (st === 'connect' || st === 'declined') box.textContent = '—';
+  else { box.classList.add('pd-failed'); box.append('Failed to load'); }
+  return false;
+}
+const safe = (fn) => { try { fn(); } catch (e) { setTimeout(() => { throw e; }); } };
+const empty = (text) => el('p', 'pd-empty', text);
+const dim = (td) => { td.textContent = '—'; td.classList.add('pd-dim'); };
+
+/* ---- values ---- */
+const cnt = (v) => d3.format(',')(Number(v));
+const num = (v) => (v === null || v === undefined || v === '' || !isFinite(Number(v)) ? null : Number(v));
+const clean = (v) => (v === null || v === undefined ? '' : String(v)
+  .replace(/\r/g, '')
+  .replace(/<br\s*\/?>/gi, '\n')
+  .replace(/\[([^\]]*)\]\((?:[^()]|\([^)]*\))*\)/g, '$1')
+  .trim());
+const safeUrl = (u) => (typeof u === 'string' && /^https:\/\//i.test(u) ? u : null);
+const safeId = (s) => String(s).replace(/[^A-Za-z0-9_-]/g, '-');
+const sgn = (n) => (n === null || n === 0 ? 'flat' : n > 0 ? 'pos' : 'neg');
+const andList = (s) => { const a = String(s || '').split(',').map((x) => x.trim()).filter(Boolean); return a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]; };
+
+/* marks: data-source / data-field / data-where / data-row */
+const esc = (s) => String(s).replace(/[&=%]/g, (c) => '%' + c.charCodeAt(0).toString(16).toUpperCase());
+function mark(node, source, field, loc) {
+  node.setAttribute('data-source', source);
+  if (field) node.setAttribute('data-field', field);
+  if (typeof loc === 'number') node.setAttribute('data-row', String(loc));
+  else if (loc) node.setAttribute('data-where', Object.entries(loc).map(([k, v]) => esc(k) + '=' + esc(v)).join('&'));
+  return node;
+}
+function fillText(node, raw, source, field, loc) {
+  const t = clean(raw);
+  node.textContent = t;
+  if (source && raw !== null && raw !== undefined && t === String(raw)) mark(node, source, field, loc);
+  return node;
+}
+
+/* ---- formats ---- */
+const F = {
+  in0: new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }),
+  in2: new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+  us0: new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }),
+  us2: new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+  qty: new Intl.NumberFormat('en-IN', { maximumFractionDigits: 4 }),
+};
+function inr(v, mode) {
+  const n = num(v);
+  if (n === null) return '—';
+  const a = Math.abs(n), s = n < 0 ? MINUS : '';
+  if (mode === 'p') return s + '₹' + F.in2.format(a);
+  if (mode !== 'f' && a >= 1e7) return s + '₹' + (a / 1e7).toFixed(2) + ' Cr';
+  if (mode !== 'f' && a >= 1e5) return s + '₹' + (a / 1e5).toFixed(2) + ' L';
+  return s + '₹' + F.in0.format(a);
+}
+function usd(v, mode) {
+  const n = num(v);
+  if (n === null) return '—';
+  return (n < 0 ? MINUS : '') + '$' + (mode === 'p' ? F.us2 : F.us0).format(Math.abs(n));
+}
+const money = (v, cur, mode) => (cur === 'USD' ? usd(v, mode) : inr(v, mode));
+function signedMoney(v, cur) {
+  const n = num(v);
+  if (n === null) return '—';
+  return (n < 0 ? MINUS : '+') + money(Math.abs(n), cur);
+}
+function pct(f, d, signed) {
+  const n = num(f);
+  if (n === null) return '—';
+  const t = Math.abs(n * 100).toFixed(d === undefined ? 1 : d);
+  const sign = +t === 0 ? '' : n < 0 ? MINUS : signed ? '+' : '';
+  return sign + t + '%';
+}
+function rfmt(v) {
+  const n = num(v);
+  if (n === null) return '—';
+  const t = Math.abs(n).toFixed(2);
+  return (+t === 0 ? '' : n < 0 ? MINUS : '+') + t + ' R';
+}
+const p2 = (n) => String(n).padStart(2, '0');
+function istDate(s) {
+  if (s === null || s === undefined || s === '') return null;
+  s = String(s).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) { const d = new Date(s + 'T00:00:00Z'); return isNaN(d) ? null : d; }
+  const z = /(?:Z|[+-]\d{2}:?\d{2})$/.test(s) ? s : s.replace(' ', 'T') + 'Z';
+  const t = Date.parse(z);
+  return isNaN(t) ? null : new Date(t + IST_MS);
+}
+const todayIso = () => new Date(Date.now() + IST_MS).toISOString().slice(0, 10);
+function dayStr(s) {
+  const d = istDate(s);
+  if (!d) return '—';
+  const yr = new Date(Date.now() + IST_MS).getUTCFullYear();
+  return d.getUTCDate() + ' ' + MON[d.getUTCMonth()] + (d.getUTCFullYear() !== yr ? ' ' + d.getUTCFullYear() : '');
+}
+function dayTimeStr(s) {
+  const d = istDate(s);
+  if (!d) return '—';
+  const base = dayStr(s);
+  return /\d{2}:\d{2}/.test(String(s)) ? base + ', ' + p2(d.getUTCHours()) + ':' + p2(d.getUTCMinutes()) + ' IST' : base;
+}
+function ageDays(s) {
+  const a = Date.parse(todayIso()), b = Date.parse(String(s).slice(0, 10));
+  return isNaN(a) || isNaN(b) ? 0 : Math.round((a - b) / 86400000);
+}
+function cmp(a, b, dir) {
+  const an = a === null || a === undefined || a === '' || (typeof a === 'number' && isNaN(a));
+  const bn = b === null || b === undefined || b === '' || (typeof b === 'number' && isNaN(b));
+  if (an && bn) return 0;
+  if (an) return 1;
+  if (bn) return -1;
+  const r = typeof a === 'number' && typeof b === 'number' ? a - b : String(a).localeCompare(String(b), 'en', { numeric: true, sensitivity: 'base' });
+  return dir === 'desc' ? -r : r;
+}
+
+/* ---- safe renderer for Notion enhanced markdown (DOM nodes, text only) ---- */
+const TAG_RE = /<\/?[a-z][a-z0-9_-]*(?:\s[^<>]*)?\/?>/g;
+const prep = (s) => s.replace(/<mention-date\b[^>]*?\bstart="([^"]*)"[^>]*>/g, (m, d) => dayStr(d));
+function inline(parent, raw, depth) {
+  let s = prep(String(raw))
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/\[([^\]]*)\]\((?:[^()]|\([^)]*\))*\)/g, '$1')
+    .replace(/\s*\{(?:[a-z_-]+="[^"]*"\s*)+\}/g, '')
+    .replace(TAG_RE, '');
+  const re = /\\([\\`*_{}\[\]()#+\-.!|~<>$])|`([^`]+)`|\*\*(.+?)\*\*|~~(.+?)~~|\*([^*\s][^*]*?)\*|\n/g;
+  let last = 0, m;
+  while ((m = re.exec(s))) {
+    if (m.index > last) parent.append(s.slice(last, m.index));
+    if (m[1] !== undefined) parent.append(m[1]);
+    else if (m[2] !== undefined) parent.append(el('code', null, m[2]));
+    else if (m[3] !== undefined) { const b = el('strong'); if ((depth || 0) < 3) inline(b, m[3], (depth || 0) + 1); else b.textContent = m[3]; parent.append(b); }
+    else if (m[4] !== undefined) { const d = el('del'); d.textContent = m[4]; parent.append(d); }
+    else if (m[5] !== undefined) { const i = el('em'); i.textContent = m[5]; parent.append(i); }
+    else parent.append(document.createElement('br'));
+    last = re.lastIndex;
+  }
+  if (last < s.length) parent.append(s.slice(last));
+}
+function buildTable(src) {
+  const wrap = el('div', 'nr-tw');
+  const table = el('table');
+  wrap.append(table);
+  const headerRow = /header-row="true"/.test(src.slice(0, src.indexOf('>') + 1));
+  let ri = 0;
+  for (const rm of src.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/g)) {
+    const tr = el('tr');
+    for (const cm of rm[1].matchAll(/<(td|th)\b[^>]*>([\s\S]*?)<\/(?:td|th)>/g)) {
+      const isTh = cm[1] === 'th' || (headerRow && ri === 0);
+      const c = el(isTh ? 'th' : 'td');
+      if (isTh) c.scope = 'col';
+      inline(c, cm[2].trim());
+      tr.append(c);
+    }
+    if (tr.children.length) { table.append(tr); ri++; }
+  }
+  return wrap;
+}
+function renderNotion(root, body) {
+  root.replaceChildren();
+  const src = String(body || '').replace(/\r\n?/g, '\n').split('\n');
+  const stack = [];
+  let cur = root;
+  let lists = [];
+  const emit = (t, raw) => {
+    let m;
+    if ((m = /^<summary[^>]*>(.*?)(?:<\/summary>)?$/.exec(t))) {
+      const d = el('div', 'nr-summary'); inline(d, m[1]); cur.append(d); lists = []; return;
+    }
+    if ((m = /^(#{1,6})\s+(.*)$/.exec(t))) {
+      const h = el('h' + (Math.min(m[1].length, 4) + 2)); inline(h, m[2]); cur.append(h); lists = []; return;
+    }
+    if (/^(?:-{3,}|\*{3,}|_{3,})$/.test(t)) { cur.append(el('hr')); lists = []; return; }
+    if ((m = /^>\s?(.*)$/.exec(t))) { const q = el('blockquote'); inline(q, m[1]); cur.append(q); lists = []; return; }
+    let kind = null;
+    if ((m = /^[-*+]\s+(.*)$/.exec(t))) kind = 'ul';
+    else if ((m = /^\d+[.)]\s+(.*)$/.exec(t))) kind = 'ol';
+    if (kind) {
+      const ind = raw.match(/^[\t ]*/)[0].replace(/\t/g, '    ').length;
+      const text = m[1].replace(/^\[( |x|X)\]\s*/, (x, c) => (c === ' ' ? '☐ ' : '☑ '));
+      while (lists.length && ind < lists[lists.length - 1].ind) lists.pop();
+      const mk = () => {
+        const prev = lists[lists.length - 1];
+        const parent = prev ? (prev.ul.lastElementChild || prev.ul) : cur;
+        const ul = el(kind); parent.append(ul); lists.push({ ind, kind, ul });
+      };
+      const top = lists[lists.length - 1];
+      if (!top || ind > top.ind) mk();
+      else if (top.kind !== kind) { lists.pop(); mk(); }
+      const li = el('li'); inline(li, text); lists[lists.length - 1].ul.append(li);
+      return;
+    }
+    if (!t.replace(TAG_RE, '').trim()) return;
+    const p = el('p'); inline(p, t); cur.append(p); lists = [];
+  };
+  for (let i = 0; i < src.length; i++) {
+    const raw = src[i];
+    let t = prep(raw.trim());
+    if (!t) { lists = []; continue; }
+    if (t.startsWith('```')) {
+      const buf = [];
+      i++;
+      while (i < src.length && !/^\s*```/.test(src[i])) { buf.push(src[i]); i++; }
+      const pre = el('pre', 'nr-pre'); pre.textContent = buf.join('\n'); cur.append(pre); lists = [];
+      continue;
+    }
+    if (/^<table\b/.test(t)) {
+      const buf = [raw];
+      while (!/<\/table>/.test(buf[buf.length - 1]) && i + 1 < src.length) { i++; buf.push(src[i]); }
+      cur.append(buildTable(buf.join('\n'))); lists = [];
+      continue;
+    }
+    const open = /^<(callout|details)\b[^>]*>(.*)$/.exec(t);
+    if (open) {
+      const box = el('div', 'nr-' + open[1]);
+      cur.append(box); stack.push(box); cur = box; lists = [];
+      t = open[2].trim();
+    }
+    let closes = 0, c;
+    while ((c = /^(.*?)\s*<\/(?:callout|details)>\s*$/.exec(t))) { t = c[1]; closes++; }
+    if (t) emit(t, raw);
+    while (closes-- > 0 && stack.length) { stack.pop(); cur = stack.length ? stack[stack.length - 1] : root; lists = []; }
+  }
+}
+function sectionOf(body, re) {
+  const lines = String(body).replace(/\r\n?/g, '\n').split('\n');
+  const lvl = (l) => { const m = /^\s*(#{1,6})\s/.exec(l); return m ? m[1].length : 0; };
+  let i = lines.findIndex((l) => lvl(l) > 0 && re.test(l));
+  const L = i >= 0 ? lvl(lines[i]) : 0;
+  if (i < 0) i = lines.findIndex((l) => l.length < 120 && re.test(l));
+  if (i < 0) return '';
+  let j = i + 1;
+  while (j < lines.length && !(lvl(lines[j]) > 0 && (L === 0 || lvl(lines[j]) <= L))) j++;
+  return lines.slice(i + 1, j).join('\n').trim();
+}
+function clipper(box, btn) {
+  const set = (o) => { box.classList.toggle('open', o); btn.setAttribute('aria-expanded', String(o)); btn.textContent = o ? 'Show less' : 'Show all'; };
+  btn.addEventListener('click', () => { set(!box.classList.contains('open')); check(); });
+  function check() {
+    const o = box.classList.contains('open');
+    const over = !o && box.scrollHeight > box.clientHeight + 4;
+    box.classList.toggle('is-clipped', over);
+    btn.hidden = !(over || o);
+  }
+  return check;
+}
+
+/* ---- tooltip inside a position:relative box ---- */
+function makeTip(box) {
+  const t = el('div', 'pd-tip');
+  t.hidden = true;
+  t.setAttribute('role', 'tooltip');
+  box.append(t);
+  return {
+    show(head, lines, x, y) {
+      t.replaceChildren(el('div', 'pd-tip-h', head), ...lines.map(([k, v]) => {
+        const d = el('div', 'pd-tip-l'); d.append(el('span', null, k), el('span', null, v)); return d;
+      }));
+      t.hidden = false;
+      const w = t.offsetWidth, h = t.offsetHeight, bw = box.clientWidth;
+      t.style.left = Math.max(4, Math.min(x + 12, bw - w - 4)) + 'px';
+      t.style.top = (y - h - 8 < 0 ? y + 16 : y - h - 8) + 'px';
+    },
+    hide() { t.hidden = true; },
+  };
+}
+
+/* ---- sortable table ---- */
+const C = (f, l, o) => Object.assign({
+  f, l,
+  sort: (r) => r[f],
+  cell: (td, r) => { const v = clean(r[f]); if (v) td.textContent = v; else dim(td); },
+}, o || {});
+function makeTable(table, cols, opts) {
+  const st = { key: opts.sort[0], dir: opts.sort[1] };
+  const thead = el('thead'), htr = el('tr'), tbody = el('tbody');
+  thead.append(htr);
+  const ths = [];
+  cols.forEach((c) => {
+    const th = el('th', [c.num ? 'num' : '', c.hide ? 'hide-sm' : '', c.stick ? 'stick' : ''].filter(Boolean).join(' '));
+    th.scope = 'col';
+    if (c.src) th.setAttribute('data-source', c.src);
+    th.setAttribute('data-field', c.f);
+    const b = el('button', 'pd-sort', c.l);
+    b.type = 'button';
+    b.addEventListener('click', () => {
+      if (st.key === c.f) st.dir = st.dir === 'asc' ? 'desc' : 'asc';
+      else { st.key = c.f; st.dir = c.num || c.first === 'desc' ? 'desc' : 'asc'; }
+      opts.redraw();
+    });
+    th.append(b);
+    htr.append(th);
+    ths.push([c, th]);
+  });
+  table.replaceChildren(thead, tbody);
+  return {
+    st,
+    paint(list) {
+      ths.forEach(([c, th]) => th.setAttribute('aria-sort', st.key === c.f ? (st.dir === 'asc' ? 'ascending' : 'descending') : 'none'));
+      const col = cols.find((c) => c.f === st.key) || cols[0];
+      const sorted = list.slice().sort((a, b) => cmp(col.sort(a), col.sort(b), st.dir));
+      tbody.replaceChildren(...sorted.map((r) => {
+        const tr = el('tr');
+        if (opts.key) tr.dataset.key = r[opts.key];
+        cols.forEach((c) => {
+          const td = el('td', [c.num ? 'num' : '', c.hide ? 'hide-sm' : '', c.stick ? 'stick' : ''].filter(Boolean).join(' '));
+          c.cell(td, r);
+          tr.append(td);
+        });
+        if (opts.onRow) opts.onRow(tr, r);
+        return tr;
+      }));
+    },
+  };
+}
+function tableGate(state, wrap, st) {
+  if (st === 'ok') { state.classList.remove('dash-skeleton', 'pd-failed'); state.replaceChildren(); state.hidden = true; wrap.hidden = false; return true; }
+  state.hidden = false; wrap.hidden = true;
+  gateBox(state, st);
+  return false;
+}
+const OPENED = new Set();
+function clampCell(td, full, lines, key, short) {
+  if (!full) { dim(td); return; }
+  const d = el('div', 'clamp c' + lines);
+  d.tabIndex = 0;
+  d.setAttribute('role', 'button');
+  const set = (o) => { d.classList.toggle('open', o); d.setAttribute('aria-expanded', String(o)); d.textContent = o || !short ? full : short; };
+  set(OPENED.has(key));
+  const flip = () => { const o = !d.classList.contains('open'); if (o) OPENED.add(key); else OPENED.delete(key); set(o); };
+  d.addEventListener('click', flip);
+  d.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); } });
+  td.classList.add('wrapc');
+  td.append(d);
+}
+
+/* ---- tabs ---- */
+const mounted = {};
+const INIT = {};
+let active = 'today';
+function show(key, fromUser, skipRender) {
+  if (!TABS.includes(key)) key = 'today';
+  active = key;
+  if (!mounted[key]) {
+    $('pd-panels').append($('tpl-' + key).content.cloneNode(true));
+    mounted[key] = true;
+    $(key).classList.add('pd-in');
+    INIT[key]();
+  }
+  TABS.forEach((k) => {
+    const p = $(k), b = $('tab-' + k);
+    if (p) p.hidden = k !== key;
+    b.setAttribute('aria-selected', String(k === key));
+    b.tabIndex = k === key ? 0 : -1;
+  });
+  if (fromUser) dash.setLink(key);
+  if (!skipRender) render();
+}
+TABS.forEach((k) => $('tab-' + k).addEventListener('click', () => show(k, true)));
+$('pd-tabs').addEventListener('keydown', (e) => {
+  const i = TABS.indexOf(document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.tab : '');
+  if (i < 0) return;
+  let n = null;
+  if (e.key === 'ArrowRight') n = (i + 1) % TABS.length;
+  else if (e.key === 'ArrowLeft') n = (i + TABS.length - 1) % TABS.length;
+  else if (e.key === 'Home') n = 0;
+  else if (e.key === 'End') n = TABS.length - 1;
+  if (n === null) return;
+  e.preventDefault();
+  show(TABS[n], true);
+  $('tab-' + TABS[n]).focus();
+});
+$('pd-app').style.setProperty('--pd-accent', dash.colors[0]);
+
+/* ---- header ---- */
+function renderHeader() {
+  const p = $('pd-takeaway');
+  const st = stOf('latest_pulse');
+  p.classList.remove('dash-skeleton', 'pd-failed');
+  if (st === 'loading') { p.classList.add('dash-skeleton'); p.textContent = '—'; return; }
+  if (st !== 'ok') {
+    p.replaceChildren();
+    if (st === 'connect' || st === 'declined') p.textContent = '—';
+    else { p.classList.add('pd-failed'); p.append('Failed to load'); }
+    return;
+  }
+  const r = oneOf('latest_pulse');
+  if (!r) { p.textContent = 'No pre-market pulse has been logged yet.'; return; }
+  const d = mark(el('span', null, dayStr(r.Date)), 'latest_pulse', 'Date', 0);
+  p.replaceChildren(d, ' pre-market');
+  if (clean(r.Headline)) { const h = el('span'); fillText(h, r.Headline, 'latest_pulse', 'Headline', 0); p.append(' · ', h); }
+}
+
+/* ---- today: regime, pulse, open setups ---- */
+function renderRegime() {
+  const box = $('regime-body'), link = $('regime-open');
+  if (!gateBox(box, stOf('latest_pulse'))) { link.hidden = true; return; }
+  const r = oneOf('latest_pulse');
+  if (!r) { link.hidden = true; box.replaceChildren(empty('No pre-market pulse has been logged yet.')); return; }
+  const u = safeUrl(r.url);
+  link.hidden = !u;
+  if (u) link.href = u;
+  const top = el('div', 'pd-regime-top');
+  top.append(mark(el('span', null, dayStr(r.Date)), 'latest_pulse', 'Date', 0), chip('Pre-market pulse', 'muted'));
+  const main = el('div', 'pd-regime-main');
+  main.append(top);
+  if (clean(r.Regime)) main.append(fillText(el('div', 'pd-regime-regime pd-pre'), r.Regime, 'latest_pulse', 'Regime', 0));
+  if (clean(r.Headline)) main.append(fillText(el('div', 'pd-regime-headline pd-pre'), r.Headline, 'latest_pulse', 'Headline', 0));
+  const stat = el('div', 'pd-stat');
+  const n = num(r['Setups proposed']);
+  stat.append(el('span', 'pd-kpi-label', 'Setups proposed'));
+  const nv = el('span', 'pd-stat-n', n === null ? '—' : cnt(n));
+  if (n !== null) mark(nv, 'latest_pulse', 'Setups proposed', 0);
+  stat.append(nv);
+  const wrap = el('div', 'pd-regime');
+  wrap.append(main, stat);
+  box.replaceChildren(wrap);
+}
+let clipPulse = null;
+function renderPulse() {
+  const box = $('pulse-box'), key = $('pulse-key'), btn = $('pulse-toggle');
+  if (!gateBox(box, stOf('latest_pulse'))) { key.hidden = true; btn.hidden = true; return; }
+  const r = oneOf('latest_pulse');
+  const body = r && r.Body ? String(r.Body) : '';
+  if (!body) {
+    SIG[box.id] = null;
+    box.replaceChildren(empty(r ? 'This pulse has no body text.' : 'No pre-market pulse has been logged yet.'));
+    key.hidden = true; btn.hidden = true;
+    return;
+  }
+  once(box.id, body, () => {
+    renderNotion(box, body);
+    const sec = sectionOf(body, /what matters for me today/i);
+    key.hidden = !sec;
+    if (sec) renderNotion($('pulse-key-body'), sec);
+  });
+  if (clipPulse) clipPulse();
+}
+function setupCard(r) {
+  const id = r['Setup ID'], w = { 'Setup ID': id };
+  const card = el('article', 'pd-setup');
+  card.id = 'setup-' + safeId(id);
+  const head = el('div', 'pd-setup-head');
+  head.append(mark(el('strong', 'pd-setup-id', id), 'ledger', 'Setup ID', w));
+  if (r.Direction) head.append(mark(chip(r.Direction, r.Direction === 'Long' ? 'ok' : r.Direction === 'Short' ? 'bad' : 'muted'), 'ledger', 'Direction', w));
+  if (r.Status) head.append(mark(chip(r.Status, 'muted'), 'ledger', 'Status', w));
+  const meta = el('span', 'pd-setup-meta');
+  const bits = [];
+  if (r.Horizon) bits.push(mark(el('span', null, r.Horizon), 'ledger', 'Horizon', w));
+  if (clean(r['Setup family'])) bits.push(fillText(el('span'), r['Setup family'], 'ledger', 'Setup family', w));
+  if (r.Market) bits.push(mark(el('span', null, r.Market), 'ledger', 'Market', w));
+  if (r['date:Frozen at:start']) { const f = el('span'); f.append('Frozen ', mark(el('span', null, dayTimeStr(r['date:Frozen at:start'])), 'ledger', 'date:Frozen at:start', w)); bits.push(f); }
+  bits.forEach((b, i) => { if (i) meta.append(' · '); meta.append(b); });
+  head.append(meta);
+  card.append(head);
+  if (clean(r.Instrument)) card.append(fillText(el('div', 'pd-setup-inst'), r.Instrument, 'ledger', 'Instrument', w));
+  const blk = (label, field) => {
+    const b = el('div', 'pd-blk');
+    const v = fillText(el('div', 'pd-blk-v'), r[field], 'ledger', field, w);
+    if (!v.textContent) { v.textContent = '—'; v.classList.add('pd-dim'); }
+    b.append(el('div', 'pd-blk-l', label), v);
+    return b;
+  };
+  const grid = el('div', 'pd-blks');
+  grid.append(blk('Trigger', 'PRE Trigger'), blk('Entry zone', 'PRE Entry zone'), blk('Stop', 'PRE Stop'), blk('Targets', 'PRE Targets'), blk('Time stop', 'PRE Time stop'));
+  card.append(grid);
+  const d1 = el('details'), s1 = el('summary', null, 'Gap and opening-range handling');
+  d1.append(s1, blk('', 'PRE Gap and opening-range handling').lastElementChild);
+  const d2 = el('details'), s2 = el('summary', null, 'Size and collateral');
+  const g2 = el('div', 'pd-blks');
+  g2.append(blk('Position size', 'PRE Position size'), blk('Collateral required', 'PRE Collateral required'), blk('Intended R', 'PRE Intended R'));
+  d2.append(s2, g2);
+  card.append(d1, d2);
+  return card;
+}
+function renderOpenSetups() {
+  const box = $('open-setups-list');
+  if (!gateBox(box, stOf('ledger'))) return;
+  const open = rowsOf('ledger')
+    .filter((r) => r.Status === 'Proposed' || r.Status === 'Entered')
+    .sort((a, b) => cmp(a['date:Frozen at:start'], b['date:Frozen at:start'], 'desc'));
+  if (!open.length) { SIG[box.id] = null; box.replaceChildren(empty('No open setups. No trade is a valid answer.')); return; }
+  once(box.id, JSON.stringify(open), () => {
+    const list = el('div', 'pd-setups');
+    list.append(...open.map(setupCard));
+    box.replaceChildren(list);
+  });
+}
+
+/* ---- today: day gate (rules are the owner's constants) ---- */
+function initGate() {
+  const readNum = (id) => { const v = $(id).value.trim(); return v === '' || !isFinite(Number(v)) ? null : Number(v); };
+  const flag = (id) => $(id).getAttribute('aria-pressed') === 'true';
+  const fmt = (n) => String(Math.round(n * 100) / 100);
+  function gate() {
+    const gap = readNum('gate-gap'), vix = readNum('gate-vix'), mv = readNum('gate-vixmove');
+    const ev = flag('gate-event'), dv = flag('gate-diverge');
+    const why = [];
+    if (gap !== null && Math.abs(gap) > RULES.gap) why.push('Opening gap of ' + fmt(gap) + '% is beyond ±' + RULES.gap.toFixed(2) + '%.');
+    if (mv !== null && Math.abs(mv) > RULES.vixMove) why.push('VIX moved ' + fmt(mv) + '% today, beyond ±' + RULES.vixMove + '%.');
+    if (ev) why.push('A high-impact event falls inside 09:15–14:30.');
+    if (dv) why.push('Heavyweights are diverging.');
+    const any = gap !== null || vix !== null || mv !== null || ev || dv;
+    const v = why.length ? 'skip' : any ? 'go' : 'wait';
+    $('gate-verdict').dataset.v = v;
+    $('gate-word').textContent = v === 'skip' ? 'SKIP' : v === 'go' ? 'GO' : 'Enter the opening numbers';
+    $('gate-why').replaceChildren(...why.map((t) => el('li', null, t)));
+    const note = $('gate-vixnote');
+    let t = '';
+    if (vix !== null) {
+      if (vix < RULES.vixLow) t = 'chop and false-breakout risk';
+      else if (vix < RULES.vixMidLo) t = 'between the chop and momentum bands, no clear read';
+      else if (vix <= RULES.vixMidHi) t = 'momentum range';
+      else if (vix <= RULES.vixHigh) t = 'between the momentum and whipsaw bands, no clear read';
+      else t = 'whipsaw risk: cut size or skip';
+      t = 'VIX at ' + fmt(vix) + ': ' + t + '.';
+    }
+    note.hidden = !t;
+    note.textContent = t;
+  }
+  ['gate-gap', 'gate-vix', 'gate-vixmove'].forEach((id) => $(id).addEventListener('input', gate));
+  ['gate-event', 'gate-diverge'].forEach((id) => $(id).addEventListener('click', () => {
+    $(id).setAttribute('aria-pressed', String(!flag(id)));
+    gate();
+  }));
+
+  let dir = 'Long';
+  function size() {
+    const risk = readNum('size-risk'), entry = readNum('size-entry'), stop = readNum('size-stop');
+    const sign = dir === 'Long' ? 1 : -1;
+    const sg = sign > 0 ? '+' : MINUS;
+    $('size-t1-l').textContent = 'T1, book half (' + sg + RULES.t1.toFixed(2) + '%)';
+    $('size-t2-l').textContent = 'T2, trail to cost (' + sg + RULES.t2.toFixed(2) + '%)';
+    const out = ['size-qty', 'size-val', 'size-loss', 'size-t1', 'size-t2'];
+    const warn = $('size-warn');
+    const reset = (msg) => { out.forEach((id) => { $(id).textContent = '—'; }); warn.hidden = !msg; warn.textContent = msg || ''; };
+    if (risk === null || entry === null || stop === null) { reset(''); return; }
+    if (entry <= 0 || stop <= 0 || risk <= 0) { reset('Risk, entry and stop must be above zero.'); return; }
+    if (entry === stop) { reset('Entry and stop are the same price.'); return; }
+    if ((dir === 'Long' && stop > entry) || (dir === 'Short' && stop < entry)) {
+      reset('The stop is on the wrong side of entry for a ' + dir.toLowerCase() + '. A ' + dir.toLowerCase() + ' needs the stop ' + (dir === 'Long' ? 'below' : 'above') + ' entry.');
+      return;
+    }
+    const dist = Math.abs(entry - stop);
+    const qty = Math.floor(risk / dist);
+    warn.hidden = qty > 0;
+    warn.textContent = qty > 0 ? '' : 'Risk is too small for one share at this stop distance.';
+    $('size-qty').textContent = F.in0.format(qty);
+    $('size-val').textContent = inr(qty * entry, 'f');
+    $('size-loss').textContent = inr(qty * dist, 'f');
+    $('size-t1').textContent = inr(entry * (1 + sign * RULES.t1 / 100), 'p');
+    $('size-t2').textContent = inr(entry * (1 + sign * RULES.t2 / 100), 'p');
+  }
+  ['size-risk', 'size-entry', 'size-stop'].forEach((id) => $(id).addEventListener('input', size));
+  const setDir = (d) => {
+    dir = d;
+    $('size-long').setAttribute('aria-pressed', String(d === 'Long'));
+    $('size-short').setAttribute('aria-pressed', String(d === 'Short'));
+    size();
+  };
+  $('size-long').addEventListener('click', () => setDir('Long'));
+  $('size-short').addEventListener('click', () => setDir('Short'));
+  gate();
+  size();
+}
+INIT.today = () => {
+  initGate();
+  clipPulse = clipper($('pulse-box'), $('pulse-toggle'));
+};
+
+/* ---- portfolio: figures ---- */
+function setTile(prefix, st, ok, text, build) {
+  const v = $(prefix + '-v'), s = $(prefix + '-s');
+  v.classList.toggle('dash-skeleton', st === 'loading');
+  s.replaceChildren();
+  v.textContent = ok ? text : '—';
+  if (!ok) {
+    if (st === 'error' || st === 'missing') { const f = el('div', 'pd-failed', 'Failed to load'); s.append(f); }
+    return;
+  }
+  build(s);
+}
+const ms = (text, src, field, loc, cls) => mark(el('span', cls || null, text), src, field, loc);
+function pnlSub(s, t, valKey, pctKey, cur) {
+  const v = num(t[valKey]);
+  const cls = sgn(v);
+  s.append('P&L ', ms(signedMoney(v, cur), 'totals', valKey, 0, cls), ' (', ms(pct(t[pctKey], 1, true), 'totals', pctKey, 0, cls), ')');
+}
+function renderKpis() {
+  const st = stOf('totals', 'fx');
+  const t = oneOf('totals'), ok = st === 'ok' && !!t;
+  setTile('kpi-total', st, ok, ok && inr(t.total_inr), (s) => {
+    const fx = oneOf('fx');
+    s.append('US at ₹', ms(fx ? F.in2.format(Number(fx.rate)) : '—', 'fx', 'rate', 0), '/$ as of ', ms(fx ? dayStr(fx.asof) : '—', 'fx', 'asof', 0));
+    const names = andList(t.elsewhere_tickers);
+    s.append('; ' + (names || 'held-elsewhere stocks') + ' at the approximate values you gave');
+  });
+  setTile('kpi-india', st, ok, ok && inr(t.india_value), (s) => pnlSub(s, t, 'india_pnl', 'india_pnl_pct', 'INR'));
+  setTile('kpi-us', st, ok, ok && usd(t.us_value), (s) => pnlSub(s, t, 'us_pnl', 'us_pnl_pct', 'USD'));
+  setTile('kpi-else', st, ok, ok && usd(t.elsewhere_value), (s) => {
+    if (t.elsewhere_tickers) s.append(ms(t.elsewhere_tickers, 'totals', 'elsewhere_tickers', 0), ' (approx.)');
+    else s.append('Nothing held outside the two books');
+  });
+  setTile('kpi-ved', st, ok, ok && pct(t.vedanta_share_of_india, 1), (s) => {
+    s.append(ms(inr(t.vedanta_value), 'totals', 'vedanta_value', 0), ' across ', ms(cnt(t.vedanta_count), 'totals', 'vedanta_count', 0), ' tickers, one position');
+  });
+  setTile('kpi-top', st, ok, ok && pct(t.largest_share, 1), (s) => {
+    s.append(ms(String(t.largest_name || '—'), 'totals', 'largest_name', 0), ' · ', ms(inr(t.largest_value_inr), 'totals', 'largest_value_inr', 0));
+  });
+}
+
+/* ---- portfolio: theme bars ---- */
+function drawThemes(box, data) {
+  box.replaceChildren();
+  const W = Math.floor(box.clientWidth);
+  if (W < 60) return;
+  const accent = dash.colors[0];
+  const svg = d3.select(box).append('svg').attr('width', '100%').attr('role', 'img').attr('aria-label', 'Bar chart of portfolio value by theme');
+  const measure = (txt, cls) => { const t = svg.append('text').attr('class', 'pd-ct ' + (cls || '')).text(txt); const w = t.node().getComputedTextLength(); t.remove(); return w; };
+  const endTxt = (d) => inr(d.value_inr) + ' · ' + pct(d.share, 1);
+  const endW = d3.max(data, (d) => measure(endTxt(d), 'v'));
+  let labelW = Math.min(d3.max(data, (d) => measure(d.Theme)), W * 0.36);
+  const stacked = W < 480 || W - labelW - 12 - endW - 8 < 90;
+  if (stacked) labelW = 0;
+  const x0 = stacked ? 0 : labelW + 12;
+  const barMax = stacked ? W : W - x0 - endW - 8;
+  const sx = d3.scaleLinear([0, d3.max(data, (d) => d.value_inr) || 1], [0, barMax]);
+  const rowH = stacked ? 40 : 30, barH = stacked ? 10 : 14, pad = 4;
+  const H = pad * 2 + data.length * rowH;
+  svg.attr('viewBox', '0 0 ' + W + ' ' + H).attr('height', H);
+  const tip = makeTip(box);
+  const fit = (sel, label, maxW) => {
+    let s = label;
+    sel.text(s);
+    while (sel.node().getComputedTextLength() > maxW && s.length > 1) { s = s.slice(0, -1); sel.text(s.trimEnd() + '…'); }
+  };
+  const lines = (d) => [['Value', inr(d.value_inr, 'f')], ['Share', pct(d.share, 1)], ['Holdings', cnt(d.positions)]];
+  data.forEach((d, i) => {
+    const y = pad + i * rowH;
+    const w = Math.max(2, sx(d.value_inr));
+    const g = svg.append('g').attr('class', 'pd-row').attr('tabindex', 0).attr('aria-label', d.Theme + ': ' + endTxt(d));
+    g.append('rect').attr('class', 'pd-hit').attr('x', 0).attr('y', y).attr('width', W).attr('height', rowH).attr('rx', 4);
+    const fill = i === 0 ? accent : 'var(--cds-chart-muted)';
+    if (stacked) {
+      fit(g.append('text').attr('class', 'pd-ct').attr('x', 0).attr('y', y + 15), d.Theme, W - endW - 12);
+      g.append('text').attr('class', 'pd-ct v').attr('x', W).attr('y', y + 15).attr('text-anchor', 'end').text(endTxt(d));
+      g.append('rect').attr('x', 0).attr('y', y + 22).attr('width', w).attr('height', barH).attr('rx', 4).style('fill', fill);
+    } else {
+      fit(g.append('text').attr('class', 'pd-ct').attr('x', 0).attr('y', y + rowH / 2).attr('dy', '0.35em'), d.Theme, labelW);
+      g.append('rect').attr('x', x0).attr('y', y + (rowH - barH) / 2).attr('width', w).attr('height', barH).attr('rx', 4).style('fill', fill);
+      g.append('text').attr('class', 'pd-ct v').attr('x', x0 + w + 6).attr('y', y + rowH / 2).attr('dy', '0.35em').text(endTxt(d));
+    }
+    g.on('pointermove', (e) => { const b = box.getBoundingClientRect(); tip.show(d.Theme, lines(d), e.clientX - b.left, e.clientY - b.top); })
+      .on('pointerleave', () => tip.hide())
+      .on('focus', () => tip.show(d.Theme, lines(d), Math.min(W - 20, x0 + w), y + rowH / 2))
+      .on('blur', () => tip.hide());
+  });
+}
+function renderThemes() {
+  const box = $('theme-chart');
+  if (!gateBox(box, stOf('by_theme'))) return;
+  const data = rowsOf('by_theme');
+  if (!data.length) { box.replaceChildren(empty('No holdings to chart yet.')); return; }
+  drawThemes(box, data);
+}
+
+/* ---- portfolio: holdings and watchlist ---- */
+let RATE = 1;
+const PNL = new Map();
+const curOf = (r) => r.Currency || (r.Market === 'US' ? 'USD' : 'INR');
+const valInr = (r) => { const v = num(r['Current value']); return v === null ? null : v * (curOf(r) === 'USD' ? RATE : 1); };
+const priceCell = (f) => (td, r) => { const v = num(r[f]); if (v === null) dim(td); else td.textContent = money(v, curOf(r), 'p'); };
+const chipCell = (f, tone) => (td, r) => {
+  const v = clean(r[f]);
+  if (!v) { dim(td); return; }
+  td.append(chip(v, tone(v)));
+};
+const asOfCell = (td, r) => {
+  const s = r['date:Price as of:start'];
+  if (!s) { dim(td); return; }
+  td.textContent = dayStr(s);
+  const age = ageDays(s);
+  if (age > STALE_DAYS) { td.classList.add('stale'); td.title = 'Price is ' + age + ' days old'; }
+};
+const HCOLS = [
+  C('Ticker', 'Ticker', { stick: true }),
+  C('Company', 'Company', { hide: true }),
+  C('Account', 'Account'),
+  C('Qty', 'Qty', { num: true, sort: (r) => num(r.Qty), cell: (td, r) => { const v = num(r.Qty); if (v === null) dim(td); else td.textContent = F.qty.format(v); } }),
+  C('Avg cost', 'Avg cost', { num: true, hide: true, sort: (r) => num(r['Avg cost']), cell: priceCell('Avg cost') }),
+  C('Last price', 'Last price', { num: true, sort: (r) => num(r['Last price']), cell: priceCell('Last price') }),
+  C('Current value', 'Current value', {
+    num: true, sort: valInr,
+    cell: (td, r) => { const v = num(r['Current value']); if (v === null) { dim(td); return; } td.textContent = (r.Account === 'Other / not shown' ? '≈' : '') + money(v, curOf(r), 'f'); },
+  }),
+  { f: 'pnl_pct', src: 'holdings_pnl', l: 'P&L %', num: true, sort: (r) => (PNL.has(r.Ticker) ? PNL.get(r.Ticker) : null),
+    cell: (td, r) => { const v = PNL.get(r.Ticker); if (v === undefined) { dim(td); return; } td.textContent = pct(v, 1, true); td.classList.add(sgn(v)); } },
+  C('Weight in own book pct', 'Weight', {
+    num: true, sort: (r) => num(r['Weight in own book pct']),
+    cell: (td, r) => {
+      const w = num(r['Weight in own book pct']);
+      if (w === null) { dim(td); return; }
+      const wrap = el('div', 'wcell'), track = el('span', 'w-track'), fill = el('span', 'w-fill');
+      fill.style.width = Math.max(0, Math.min(100, w)) + '%';
+      track.append(fill);
+      wrap.append(el('span', null, w.toFixed(1) + '%'), track);
+      td.append(wrap);
+    },
+  }),
+  C('Theme', 'Theme', { hide: true }),
+  C('Classification', 'Classification', { cell: chipCell('Classification', (v) => (v === 'Unclassified' ? 'muted' : '')) }),
+  C('Pledged', 'Pledged', { cell: chipCell('Pledged', (v) => (v === 'Unverified' ? 'warn' : v === 'No' ? 'muted' : '')) }),
+  C('date:Price as of:start', 'Price as of', { cell: asOfCell, first: 'desc' }),
+];
+const WCOLS = [
+  C('Ticker', 'Ticker', { stick: true }),
+  C('Company', 'Company'),
+  C('Theme', 'Theme', { hide: true }),
+  C('Last price', 'Last price', { num: true, sort: (r) => num(r['Last price']), cell: priceCell('Last price') }),
+  C('date:Price as of:start', 'Price as of', { cell: asOfCell, first: 'desc' }),
+  C('Next catalyst', 'Next catalyst', { sort: (r) => clean(r['Next catalyst']), cell: (td, r) => clampCell(td, clean(r['Next catalyst']), 3, 'watch:' + r.Ticker) }),
+];
+let HT = null, WT = null;
+function renderHoldings() {
+  if (!HT) return;
+  const st = stOf('portfolio', 'fx');
+  if (!tableGate($('holdings-state'), $('holdings-wrap'), st)) { $('holdings-empty').hidden = true; return; }
+  RATE = num((oneOf('fx') || {}).rate) || 1;
+  PNL.clear();
+  rowsOf('holdings_pnl').forEach((r) => PNL.set(r.Ticker, r.pnl_pct));
+  const q = $('holdings-search').value.trim().toLowerCase();
+  const list = rowsOf('portfolio')
+    .filter((r) => r.Status === 'Holding')
+    .filter((r) => !q || [r.Ticker, r.Company, r.Account, r.Theme, r.Classification, r.Pledged].join(' ').toLowerCase().includes(q));
+  HT.paint(list);
+  $('holdings-empty').hidden = list.length > 0;
+}
+function renderWatch() {
+  if (!WT) return;
+  if (!tableGate($('watch-state'), $('watch-wrap'), stOf('portfolio'))) return;
+  const list = rowsOf('portfolio').filter((r) => r.Status === 'Watch');
+  if (!list.length) {
+    $('watch-wrap').hidden = true;
+    const s = $('watch-state');
+    s.hidden = false;
+    s.replaceChildren(empty('Nothing on the watchlist.'));
+    return;
+  }
+  WT.paint(list);
+}
+
+/* ---- portfolio: waiting on you ---- */
+function proposalOf(notes) {
+  const s = String(notes || '').replace(/\r/g, '');
+  const i = s.indexOf('PROPOSED (');
+  if (i < 0) return null;
+  let rest = s.slice(i);
+  const dbl = /<br\s*\/?>\s*<br\s*\/?>|\n\s*\n/i.exec(rest);
+  if (dbl) rest = rest.slice(0, dbl.index);
+  else { const one = /<br\s*\/?>|\n/i.exec(rest); if (one) rest = rest.slice(0, one.index); }
+  return clean(rest);
+}
+function proposedLabel(text, current) {
+  const body = text.replace(/^PROPOSED \([^)]*\):?/, '');
+  const find = (skip) => {
+    let best = null;
+    for (const c of CLASSES) {
+      const i = body.indexOf(c);
+      if (i >= 0 && !(skip && c === current) && (best === null || i < best.i)) best = { c, i };
+    }
+    return best;
+  };
+  const b = find(true) || find(false);
+  return b ? b.c : null;
+}
+function renderWaiting() {
+  const box = $('waiting-body');
+  if (!gateBox(box, stOf('portfolio', 'data_gaps'))) return;
+  const g = oneOf('data_gaps');
+  const props = rowsOf('portfolio').filter((r) => r.Status === 'Holding' && proposalOf(r['Thesis and notes']));
+  box.replaceChildren();
+  box.append(el('h3', 'pd-h3', 'Classification proposals'));
+  if (!props.length) box.append(empty('No classification proposals are waiting for a yes or no.'));
+  else {
+    const ul = el('ul', 'pd-sublist');
+    props.forEach((r) => {
+      const text = proposalOf(r['Thesis and notes']);
+      const li = el('li', 'pd-prop');
+      const h = el('div', 'pd-prop-h');
+      h.append(mark(el('strong', null, r.Ticker), 'portfolio', 'Ticker', { Ticker: r.Ticker }));
+      h.append(chip('now ' + (clean(r.Classification) || 'Unclassified'), 'muted'));
+      const label = proposedLabel(text, clean(r.Classification));
+      if (label) h.append(chip('proposed: ' + label));
+      li.append(h, el('p', 'pd-pre', text));
+      ul.append(li);
+    });
+    box.append(ul);
+  }
+  box.append(el('h3', 'pd-h3', 'Data gaps'));
+  const gl = el('ul', 'pd-gaps');
+  if (g) {
+    const a = el('li');
+    a.append(ms(cnt(g.unverified_pledged_india), 'data_gaps', 'unverified_pledged_india', 0), ' Indian holdings have an unverified pledge status' + (g.unverified_tickers ? ' (' + g.unverified_tickers + ')' : '') + '. Which stocks are pledged, and their haircuts, are unverified.');
+    const b = el('li');
+    b.append(ms(cnt(g.no_qty), 'data_gaps', 'no_qty', 0), ' holdings have no quantity' + (g.no_qty_tickers ? ' (' + g.no_qty_tickers + ')' : '') + ', so their value is the approximate figure you gave.');
+    gl.append(a, b);
+  }
+  box.append(gl);
+}
+
+/* ---- portfolio: collateral ---- */
+let clipColl = null;
+function renderCollateral() {
+  const box = $('collateral-body'), link = $('collateral-open'), btn = $('collateral-toggle');
+  if (!gateBox(box, stOf('collateral'))) { link.hidden = true; btn.hidden = true; return; }
+  const r = oneOf('collateral');
+  const u = r && safeUrl(r.url);
+  link.hidden = !u;
+  if (u) link.href = u;
+  if (!r || !r.Body) { SIG[box.id] = null; box.replaceChildren(empty('The collateral page has no text yet.')); btn.hidden = true; return; }
+  once(box.id, String(r.Body), () => renderNotion(box, String(r.Body)));
+  if (clipColl) clipColl();
+}
+INIT.portfolio = () => {
+  HT = makeTable($('holdings-table'), HCOLS, { sort: ['Current value', 'desc'], key: 'Ticker', redraw: renderHoldings });
+  WT = makeTable($('watch-table'), WCOLS, { sort: ['Ticker', 'asc'], key: 'Ticker', redraw: renderWatch });
+  $('holdings-search').addEventListener('input', renderHoldings);
+  clipColl = clipper($('collateral-body'), $('collateral-toggle'));
+};
+
+/* ---- research: record, ledger, pipeline, rejected ---- */
+const SEL = { setup: null, hyp: null };
+function renderStats() {
+  const st = stOf('setup_stats');
+  const s = oneOf('setup_stats'), ok = st === 'ok' && !!s;
+  const whole = cnt;
+  setTile('kpi-frozen', st, ok, ok && whole(s.frozen), () => {});
+  setTile('kpi-open', st, ok, ok && whole(s.open), () => {});
+  setTile('kpi-trig', st, ok, ok && whole(s.triggered), () => {});
+  setTile('kpi-entered', st, ok, ok && whole(s.entered), () => {});
+  setTile('kpi-avgr', st, ok, ok && rfmt(s.avg_theoretical_R), (sub) => {
+    sub.append('n = ', ms(whole(s.scored), 'setup_stats', 'scored', 0));
+  });
+  if (ok) {
+    const v = $('kpi-avgr-v');
+    v.classList.remove('pos', 'neg');
+    if (num(s.avg_theoretical_R) !== null) v.classList.add(sgn(num(s.avg_theoretical_R)));
+  }
+  const note = $('stats-note');
+  note.replaceChildren();
+  if (ok) {
+    const n = ms(whole(s.scored), 'setup_stats', 'scored', 0);
+    if (s.scored < SCORED_MIN) note.append('Too few scored setups to judge any edge yet (n = ', n, ').');
+    else note.append('Average theoretical R is measured on ', n, ' scored setups. It describes what was frozen, not what comes next.');
+  }
+}
+const rCell = (f) => (td, r) => { const v = num(r[f]); if (v === null) { dim(td); return; } td.textContent = rfmt(v); td.classList.add(sgn(v)); };
+const firstSentence = (t) => { const m = /^[\s\S]*?[.!?](?=\s|$)/.exec(t); return m ? m[0] : t; };
+const LCOLS = [
+  C('Setup ID', 'Setup', { stick: true }),
+  C('date:Frozen at:start', 'Frozen (IST)', { first: 'desc', cell: (td, r) => { const s = r['date:Frozen at:start']; if (s) td.textContent = dayTimeStr(s); else dim(td); } }),
+  C('Instrument', 'Instrument', { sort: (r) => clean(r.Instrument), cell: (td, r) => { const full = clean(r.Instrument); clampCell(td, full, 2, 'ledger:' + r['Setup ID'], firstSentence(full)); } }),
+  C('Direction', 'Direction', { cell: chipCell('Direction', (v) => (v === 'Long' ? 'ok' : v === 'Short' ? 'bad' : 'muted')) }),
+  C('Horizon', 'Horizon'),
+  C('Setup family', 'Setup family'),
+  C('Status', 'Status', { cell: chipCell('Status', () => 'muted') }),
+  C('POST Trigger occurred', 'Trigger occurred'),
+  C('POST Outcome', 'Outcome'),
+  C('POST Theoretical R', 'Theoretical R', { num: true, sort: (r) => num(r['POST Theoretical R']), cell: rCell('POST Theoretical R') }),
+  C('Data quality', 'Data quality', { cell: (td, r) => { const v = clean(r['Data quality']); if (!v) { dim(td); return; } td.textContent = v; if (v !== 'Full') td.style.color = 'var(--color-warn)'; } }),
+];
+const RCOLS = [
+  C('Name', 'Name', { stick: true, cell: (td, r) => { td.textContent = r.Name; td.classList.add('wrapc'); } }),
+  C('date:Date:start', 'Date', { first: 'desc', cell: (td, r) => { if (r['date:Date:start']) td.textContent = dayStr(r['date:Date:start']); else dim(td); } }),
+  C('Rejection reason', 'Rejection reason', { sort: (r) => clean(r['Rejection reason']), cell: (td, r) => clampCell(td, clean(r['Rejection reason']), 2, 'rej:r:' + r.Name) }),
+  C('Subsequent price behaviour', 'Subsequent price behaviour', {
+    sort: (r) => clean(r['Subsequent price behaviour']),
+    cell: (td, r) => {
+      const v = clean(r['Subsequent price behaviour']);
+      if (v) clampCell(td, v, 2, 'rej:s:' + r.Name);
+      else { td.textContent = 'Not scored yet'; td.classList.add('pd-dim'); }
+    },
+  }),
+];
+let LT = null, RT = null;
+function renderLedgerDetail() {
+  const box = $('ledger-detail');
+  box.replaceChildren();
+  const r = rowsOf('ledger').find((x) => x['Setup ID'] === SEL.setup);
+  if (!r) { box.append(empty('Select a setup above to read its thesis, trigger and lessons.')); return; }
+  const w = { 'Setup ID': r['Setup ID'] };
+  const head = el('div', 'pd-setup-head');
+  head.append(mark(el('strong', 'pd-setup-id', r['Setup ID']), 'ledger', 'Setup ID', w));
+  if (clean(r.Instrument)) head.append(el('span', 'pd-setup-meta', firstSentence(clean(r.Instrument))));
+  box.append(head);
+  [['Thesis', 'PRE Thesis', 'Not recorded.'], ['Trigger', 'PRE Trigger', 'Not recorded.'], ['Lessons', 'POST Lessons', 'No lessons recorded yet.']].forEach(([label, f, none]) => {
+    const b = el('div', 'pd-blk');
+    const v = fillText(el('div', 'pd-blk-v'), r[f], 'ledger', f, w);
+    if (!v.textContent) { v.textContent = none; v.classList.add('pd-dim'); }
+    b.append(el('div', 'pd-blk-l', label), v);
+    box.append(b);
+  });
+}
+function renderLedger() {
+  if (!LT) return;
+  if (!tableGate($('ledger-state'), $('ledger-wrap'), stOf('ledger'))) { $('ledger-detail').replaceChildren(); return; }
+  const list = rowsOf('ledger');
+  if (!list.length) {
+    $('ledger-wrap').hidden = true;
+    const s = $('ledger-state'); s.hidden = false; s.replaceChildren(empty('No setups have been frozen yet.'));
+    $('ledger-detail').replaceChildren();
+    return;
+  }
+  LT.paint(list);
+  renderLedgerDetail();
+}
+function stageOf(r) { return r.Stage || 'Hypothesis'; }
+function hcard(r) {
+  const w = { Name: r.Name };
+  const b = el('button', 'pd-hcard');
+  b.type = 'button';
+  b.dataset.name = r.Name;
+  b.setAttribute('aria-pressed', String(SEL.hyp === r.Name));
+  b.append(mark(el('span', 'pd-hcard-n', r.Name), 'lab', 'Name', w));
+  const m = el('span', 'pd-hcard-m');
+  const nSize = num(r['Sample size']), nWins = num(r.Wins);
+  m.append('n = ', nSize === null ? '—' : mark(el('span', null, cnt(nSize)), 'lab', 'Sample size', w), ' · wins = ', nWins === null ? '—' : mark(el('span', null, cnt(nWins)), 'lab', 'Wins', w));
+  b.append(m);
+  const ex = num(r['Expectancy R']);
+  if (ex !== null) { const e = el('span', 'pd-hcard-m'); e.append('Expectancy ', mark(el('span', sgn(ex)), 'lab', 'Expectancy R', w)); e.lastChild.textContent = rfmt(ex); b.append(e); }
+  if (r['date:Date:start']) b.append(mark(el('span', 'pd-hcard-m', dayStr(r['date:Date:start'])), 'lab', 'date:Date:start', w));
+  b.addEventListener('click', () => {
+    SEL.hyp = r.Name;
+    $('pipe-board').querySelectorAll('.pd-hcard').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.name === r.Name)));
+    renderHypDetail();
+  });
+  return b;
+}
+function renderHypDetail() {
+  const box = $('pipe-detail');
+  box.replaceChildren();
+  const r = rowsOf('lab').find((x) => x.Type === 'Strategy hypothesis' && x.Name === SEL.hyp);
+  if (!r) { box.append(empty('Select a hypothesis above to read its statement, evidence and decision log.')); return; }
+  const w = { Name: r.Name };
+  const head = el('div', 'pd-setup-head');
+  head.append(mark(el('strong', 'pd-setup-id', r.Name), 'lab', 'Name', w), mark(chip(stageOf(r), 'muted'), 'lab', 'Stage', w));
+  box.append(head);
+  [['Statement', 'Statement'], ['Evidence so far', 'Evidence so far'], ['Decision log', 'Decision log']].forEach(([label, f]) => {
+    const b = el('div', 'pd-blk');
+    const v = fillText(el('div', 'pd-blk-v'), r[f], 'lab', f, w);
+    if (!v.textContent) { v.textContent = 'Nothing recorded yet.'; v.classList.add('pd-dim'); }
+    b.append(el('div', 'pd-blk-l', label), v);
+    box.append(b);
+  });
+}
+function renderPipeline() {
+  const box = $('pipe-board');
+  if (!gateBox(box, stOf('lab', 'lab_stages'))) { $('pipe-detail').replaceChildren(); return; }
+  const stages = rowsOf('lab_stages');
+  const hyp = rowsOf('lab').filter((r) => r.Type === 'Strategy hypothesis');
+  box.replaceChildren(...stages.map((s) => {
+    const col = el('div', 'pd-col');
+    const h = el('div', 'pd-col-head');
+    h.append(mark(el('span', null, s.Stage), 'lab_stages', 'Stage', { Stage: s.Stage }), mark(el('span', 'n', cnt(s.n)), 'lab_stages', 'n', { Stage: s.Stage }));
+    col.append(h);
+    const cards = hyp.filter((r) => stageOf(r) === s.Stage).sort((a, b) => cmp(a['date:Date:start'], b['date:Date:start'], 'desc'));
+    if (!cards.length) col.append(el('p', 'pd-note', 'None'));
+    cards.forEach((r) => col.append(hcard(r)));
+    return col;
+  }));
+  renderHypDetail();
+}
+function renderRejected() {
+  if (!RT) return;
+  if (!tableGate($('rej-state'), $('rej-wrap'), stOf('lab'))) return;
+  const list = rowsOf('lab').filter((r) => r.Type === 'Rejected trade');
+  if (!list.length) {
+    $('rej-wrap').hidden = true;
+    const s = $('rej-state'); s.hidden = false; s.replaceChildren(empty('No rejected trades logged yet.'));
+    return;
+  }
+  RT.paint(list);
+}
+INIT.research = () => {
+  LT = makeTable($('ledger-table'), LCOLS, {
+    sort: ['date:Frozen at:start', 'desc'], key: 'Setup ID', redraw: renderLedger,
+    onRow: (tr, r) => {
+      const id = r['Setup ID'];
+      tr.tabIndex = 0;
+      if (SEL.setup === id) tr.classList.add('sel');
+      const pick = () => {
+        SEL.setup = id;
+        $('ledger-table').querySelectorAll('tbody tr').forEach((x) => x.classList.toggle('sel', x.dataset.key === id));
+        renderLedgerDetail();
+      };
+      tr.addEventListener('click', (e) => { if (!e.target.closest('.clamp')) pick(); });
+      tr.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target === tr) { e.preventDefault(); pick(); } });
+    },
+  });
+  RT = makeTable($('rej-table'), RCOLS, { sort: ['date:Date:start', 'desc'], key: 'Name', redraw: renderRejected });
+};
+
+/* ---- log ---- */
+const LOGF = { f: 'all', n: 30 };
+function logItem(r) {
+  const w = { Title: r.Title };
+  const li = el('li', 'pd-log-item');
+  li.style.setProperty('--chip', dash.colors[LOG_TYPES[r.Type] !== undefined ? LOG_TYPES[r.Type] : 0]);
+  const top = el('div', 'pd-log-top');
+  top.append(mark(el('span', null, dayStr(r['date:Date:start'])), 'pulse', 'date:Date:start', w));
+  if (r.Type) top.append(mark(chip(r.Type, 'tag'), 'pulse', 'Type', w));
+  const u = safeUrl(r.url);
+  if (u) {
+    const a = el('a', 'pd-link', 'Open');
+    a.href = u; a.target = '_blank'; a.rel = 'noopener';
+    a.setAttribute('aria-label', 'Open ' + (clean(r.Title) || 'entry') + ' in Notion');
+    top.append(a);
+  }
+  li.append(top);
+  li.append(fillText(el('div', 'pd-log-title'), r.Title, 'pulse', 'Title', w));
+  if (clean(r.Headline)) li.append(fillText(el('div', 'pd-log-headline'), r.Headline, 'pulse', 'Headline', w));
+  const reg = clean(r.Regime);
+  if (reg) {
+    const d = el('div', 'pd-log-regime');
+    const k = 'log:' + r.Title;
+    const c = el('div', 'clamp c2', reg);
+    c.tabIndex = 0;
+    c.setAttribute('role', 'button');
+    const set = (o) => { c.classList.toggle('open', o); c.setAttribute('aria-expanded', String(o)); };
+    set(OPENED.has(k));
+    const flip = () => { const o = !c.classList.contains('open'); if (o) OPENED.add(k); else OPENED.delete(k); set(o); };
+    c.addEventListener('click', flip);
+    c.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); } });
+    if (reg === String(r.Regime)) mark(c, 'pulse', 'Regime', w);
+    d.append(c);
+    li.append(d);
+  }
+  return li;
+}
+function renderLog() {
+  const box = $('log-list'), more = $('log-more');
+  if (!gateBox(box, stOf('pulse'))) { more.hidden = true; return; }
+  const all = rowsOf('pulse').filter((r) => LOGF.f === 'all' || r.Type === LOGF.f);
+  all.sort((a, b) => cmp(a['date:Date:start'], b['date:Date:start'], 'desc')
+    || cmp(LOG_PRI[a.Type] === undefined ? 9 : LOG_PRI[a.Type], LOG_PRI[b.Type] === undefined ? 9 : LOG_PRI[b.Type], 'asc')
+    || cmp(a.Title, b.Title, 'asc'));
+  if (!all.length) { box.replaceChildren(empty('Nothing logged yet.')); more.hidden = true; return; }
+  const ol = el('ol', 'pd-log');
+  ol.append(...all.slice(0, LOGF.n).map(logItem));
+  box.replaceChildren(ol);
+  more.hidden = all.length <= LOGF.n;
+}
+INIT.log = () => {
+  $('log-filter').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-f]');
+    if (!b) return;
+    LOGF.f = b.dataset.f;
+    LOGF.n = 30;
+    $('log-filter').querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    renderLog();
+  });
+  $('log-more').addEventListener('click', () => { LOGF.n += 30; renderLog(); });
+};
+
+/* ---- draw everything the open tab needs ---- */
+function render() {
+  safe(renderHeader);
+  if (active === 'today') { safe(renderRegime); safe(renderPulse); safe(renderOpenSetups); }
+  else if (active === 'portfolio') {
+    safe(renderKpis); safe(renderThemes); safe(renderHoldings); safe(renderWaiting); safe(renderWatch); safe(renderCollateral);
+  } else if (active === 'research') {
+    safe(renderStats); safe(renderLedger); safe(renderPipeline); safe(renderRejected);
+  } else if (active === 'log') safe(renderLog);
+}
+
+let hash = '';
+try { hash = decodeURIComponent((location.hash || '').slice(1)); } catch (e) { hash = ''; }
+show(TAB_OF[hash] || 'today', false, true);
+dash.onData(render);
+</script>
