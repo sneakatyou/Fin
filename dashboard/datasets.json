@@ -2,37 +2,120 @@
   "_note": "Copy of the dashboard's data sources (datasets/<id> documents in the artifact store). Each live query runs with the viewer's own Notion access. View-mode queries do not count against the Notion workspace's SQL query allowance.",
   "portfolio": {
     "title": "Portfolio Book",
-    "source": {"kind": "query", "connector": "Notion", "tool": "notion-query-data-sources",
-      "args": {"data": {"mode": "view", "view_url": "https://app.notion.com/p/97562cfcba2f4dfe92067252a79b98db?v=a92ff4a6b36d4d79854dc1adde201a03", "page_size": 100}}}
+    "source": {
+      "kind": "query",
+      "connector": "Notion",
+      "tool": "notion-query-data-sources",
+      "args": {
+        "data": {
+          "mode": "view",
+          "view_url": "https://app.notion.com/p/97562cfcba2f4dfe92067252a79b98db?v=a92ff4a6b36d4d79854dc1adde201a03",
+          "page_size": 100
+        }
+      }
+    }
   },
   "ledger": {
     "title": "Trading Ledger",
-    "source": {"kind": "query", "connector": "Notion", "tool": "notion-query-data-sources",
-      "args": {"data": {"mode": "view", "view_url": "https://app.notion.com/p/9ded500c55f6484f94f28665fa59f039?v=a54f077f0ac5444685d967dd341c0c3f", "page_size": 100}}}
+    "source": {
+      "kind": "query",
+      "connector": "Notion",
+      "tool": "notion-query-data-sources",
+      "args": {
+        "data": {
+          "mode": "view",
+          "view_url": "https://app.notion.com/p/9ded500c55f6484f94f28665fa59f039?v=a54f077f0ac5444685d967dd341c0c3f",
+          "page_size": 100
+        }
+      }
+    }
   },
   "lab": {
     "title": "Hypothesis Lab",
-    "source": {"kind": "query", "connector": "Notion", "tool": "notion-query-data-sources",
-      "args": {"data": {"mode": "view", "view_url": "https://app.notion.com/p/2320731d5d6f4d92ae6c87f75430b96c?v=9a9804d2f51a4d038329db9a4d841761", "page_size": 100}}}
+    "source": {
+      "kind": "query",
+      "connector": "Notion",
+      "tool": "notion-query-data-sources",
+      "args": {
+        "data": {
+          "mode": "view",
+          "view_url": "https://app.notion.com/p/2320731d5d6f4d92ae6c87f75430b96c?v=9a9804d2f51a4d038329db9a4d841761",
+          "page_size": 100
+        }
+      }
+    }
   },
   "pulse": {
     "title": "Pulse and review log",
-    "source": {"kind": "query", "connector": "Notion", "tool": "notion-query-data-sources",
-      "args": {"data": {"mode": "view", "view_url": "https://app.notion.com/p/a2e877372ad0460a887cfe9de226eaea?v=765ff8501e82456a8bd9189ba7fb9c1c", "page_size": 100}}}
+    "source": {
+      "kind": "query",
+      "connector": "Notion",
+      "tool": "notion-query-data-sources",
+      "args": {
+        "data": {
+          "mode": "view",
+          "view_url": "https://app.notion.com/p/a2e877372ad0460a887cfe9de226eaea?v=765ff8501e82456a8bd9189ba7fb9c1c",
+          "page_size": 100
+        }
+      }
+    }
   },
   "latest_pulse": {
     "title": "Latest pre-market pulse",
-    "source": {"kind": "query", "connector": "Notion", "tool": "notion-query-data-sources",
-      "args": {"data": {"mode": "view", "view_url": "https://app.notion.com/p/a2e877372ad0460a887cfe9de226eaea?v=765ff8501e82456a8bd9189ba7fb9c1c", "page_size": 100}}},
+    "source": {
+      "kind": "query",
+      "connector": "Notion",
+      "tool": "notion-query-data-sources",
+      "args": {
+        "data": {
+          "mode": "view",
+          "view_url": "https://app.notion.com/p/a2e877372ad0460a887cfe9de226eaea?v=765ff8501e82456a8bd9189ba7fb9c1c",
+          "page_size": 100
+        }
+      }
+    },
     "loader": "picks the newest Pre-market pulse row, then notion-fetch on its page for the body"
   },
   "collateral": {
     "title": "Collateral and stress test",
-    "source": {"kind": "query", "connector": "Notion", "tool": "notion-fetch",
-      "args": {"id": "https://app.notion.com/p/3f0161afda38813dad5eff184f819d25"}}
+    "source": {
+      "kind": "query",
+      "connector": "Notion",
+      "tool": "notion-fetch",
+      "args": {
+        "id": "https://app.notion.com/p/3f0161afda38813dad5eff184f819d25"
+      }
+    }
   },
   "fx": {
     "title": "USD/INR rate",
-    "source": {"kind": "file", "url": "/_blob/40e333e206cb707d86d0f19c3007e359", "name": "fx-usdinr.json"}
+    "source": {
+      "kind": "file",
+      "url": "/_blob/40e333e206cb707d86d0f19c3007e359",
+      "name": "fx-usdinr.json"
+    }
+  },
+  "brain_index": {
+    "title": "Brain pages",
+    "source": {
+      "kind": "query",
+      "connector": "Notion",
+      "tool": "notion-fetch",
+      "args": {
+        "id": "https://app.notion.com/p/3fd161afda388142b2aafba4568df165"
+      }
+    }
+  },
+  "brain_page": {
+    "title": "Brain page",
+    "source": {
+      "kind": "query",
+      "connector": "Notion",
+      "tool": "notion-fetch",
+      "args": {
+        "id": "{{brain_page}}"
+      }
+    },
+    "param_default": "https://app.notion.com/p/3fd161afda388121b978e82887bb6675 (Checklists)"
   }
 }
