@@ -28,6 +28,7 @@ Scheduled Claude runs (claude.ai)          Notion: Trading Research System      
 | `dashboard/datasets.json` | Where each number on the page comes from: the Notion views and the FX file |
 | `dashboard/fx-usdinr.json` | The USD/INR rate used to convert the US book, with its date and source |
 | `docs/broker-integration.md` | How Upstox and INDmoney could feed real holdings and prices |
+| `brain/` | Copies of the Notion Brain pages: checklists (read by every run), the rolling retrospective, masters of investing, traders and psychology, research evidence, and quant firms with the roadmap |
 
 ## Updating the dashboard
 
