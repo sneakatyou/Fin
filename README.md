@@ -47,6 +47,7 @@ Scheduled Claude runs (claude.ai)              Notion: Trading Research System  
 | `dashboard/build.sh` | Concatenates `src/` into `index.html` |
 | `dashboard/v2-dashboard-type/` | The previous read-only dashboard and its data-source definitions |
 | `docs/broker-integration.md` | How Upstox and INDmoney could feed real holdings and prices |
+| `desk/` | First editions of the Macro Map and Money moves (mutual funds and new money) pages from the Markets and News Desk; Notion holds the live versions, rewritten by the Sunday run |
 | `brain/` | Copies of the Notion Brain pages: checklists (read by every run), the rolling retrospective, masters of investing, traders and psychology, research evidence, and quant firms with the roadmap |
 
 ## Updating the dashboard
