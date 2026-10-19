@@ -1,0 +1,633 @@
+
+<div class="pd" id="pd-app">
+  <header class="pd-head" id="pd-header">
+    <div class="pd-headrow">
+      <div>
+        <h1 class="pd-title" id="pd-title">Portfolio Desk</h1>
+      </div>
+      <div class="pd-headtools">
+        <span class="pd-updated" id="pd-updated" aria-live="polite"></span>
+        <button class="pd-btn small" id="pd-refresh" type="button">Refresh</button>
+        <button class="pd-btn small primary" id="pd-ask-desk" type="button" hidden>Ask the desk</button>
+      </div>
+    </div>
+    <div class="pd-clampbox" id="pd-takeaway-box">
+      <p class="pd-clamp pd-takeaway dash-skeleton" id="pd-takeaway">—</p>
+      <button class="pd-textbtn" id="pd-takeaway-more" type="button" aria-expanded="false" aria-controls="pd-takeaway" hidden>Show more</button>
+    </div>
+  </header>
+
+  <div class="pd-banner" id="pd-banner" role="status" hidden>
+    <p id="pd-banner-text"></p>
+    <button class="pd-btn small" id="pd-banner-btn" type="button" hidden></button>
+  </div>
+
+  <div class="pd-navwrap">
+    <div class="pd-tabs" id="pd-tabs" role="tablist" aria-label="Sections">
+      <button class="pd-tab" id="tab-today" role="tab" type="button" aria-selected="true" aria-controls="today" data-tab="today">Today</button>
+      <button class="pd-tab" id="tab-news" role="tab" type="button" aria-selected="false" aria-controls="news" tabindex="-1" data-tab="news">News<span class="badge" id="news-badge" hidden></span></button>
+      <button class="pd-tab" id="tab-markets" role="tab" type="button" aria-selected="false" aria-controls="markets" tabindex="-1" data-tab="markets">Markets</button>
+      <button class="pd-tab" id="tab-portfolio" role="tab" type="button" aria-selected="false" aria-controls="portfolio" tabindex="-1" data-tab="portfolio">Portfolio</button>
+      <button class="pd-tab" id="tab-research" role="tab" type="button" aria-selected="false" aria-controls="research" tabindex="-1" data-tab="research">Trades &amp; research</button>
+      <button class="pd-tab" id="tab-ideas" role="tab" type="button" aria-selected="false" aria-controls="ideas" tabindex="-1" data-tab="ideas">Ideas</button>
+      <button class="pd-tab" id="tab-log" role="tab" type="button" aria-selected="false" aria-controls="log" tabindex="-1" data-tab="log">Log</button>
+      <button class="pd-tab" id="tab-brain" role="tab" type="button" aria-selected="false" aria-controls="brain" tabindex="-1" data-tab="brain">Brain</button>
+    </div>
+  </div>
+
+  <div id="pd-panels"></div>
+
+  <p class="pd-foot" id="pd-foot">Research for your own decisions, not advice. Read live from Notion (Trading Research System) with your own Notion access. Decisions and notes you record here go to the Decisions Inbox in Notion; the scheduled runs apply them under the Playbook's rules. Nothing here places an order.</p>
+
+  <!-- Today -->
+  <template id="tpl-today">
+    <section id="today" class="pd-panel" role="tabpanel" aria-labelledby="tab-today">
+      <div class="pd-stack">
+        <section id="today-band" class="pd-band" aria-label="Today at a glance">
+          <div class="pd-bandcell pd-bc-date">
+            <span class="pd-kpi-label">Pre-market pulse</span>
+            <span class="pd-band-v dash-skeleton" id="band-date">—</span>
+          </div>
+          <div class="pd-bandcell pd-bc-regime">
+            <span class="pd-kpi-label">Market regime</span>
+            <span class="pd-band-regime dash-skeleton" id="band-regime">—</span>
+          </div>
+          <div class="pd-bandcell pd-bc-setups" id="band-c-setups">
+            <span class="pd-kpi-label">Setups proposed</span>
+            <span class="pd-band-v dash-skeleton" id="band-setups">—</span>
+            <span class="pd-band-sub" id="band-setups-s"></span>
+          </div>
+          <button class="pd-bandcell pd-bc-gate" id="band-gate" type="button" data-v="wait" aria-label="Day gate: go to the checks">
+            <span class="pd-kpi-label">Day gate</span>
+            <span class="pd-band-v" id="band-gate-word">Not checked</span>
+            <span class="pd-band-sub" id="band-gate-s">Enter the opening numbers below</span>
+          </button>
+        </section>
+
+        <section id="today-news" class="pd-sec" aria-labelledby="today-news-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="today-news-h">Top of the day</h2>
+              <p class="pd-note">The stories the morning news run ranked highest. Select one to read it in full and ask about it.</p>
+            </div>
+            <div class="pd-sec-tools"><button class="pd-btn small" type="button" id="today-all-news">All news</button></div>
+          </div>
+          <div id="today-news-list" class="pd-top pd-box dash-skeleton"></div>
+        </section>
+
+        <section id="market-read" class="pd-sec" aria-labelledby="market-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="market-h">Market read</h2>
+              <p class="pd-note">From the latest pre-market pulse, as written by the morning run.</p>
+            </div>
+            <div class="pd-sec-tools"><button class="pd-btn small" type="button" id="pulse-ask" hidden>Ask about this pulse</button></div>
+          </div>
+          <section id="pulse-key" class="pd-card pd-key accent" aria-labelledby="pulse-key-h" hidden>
+            <h3 class="pd-card-t" id="pulse-key-h">What matters for me today</h3>
+            <div id="pulse-key-body" class="nr"></div>
+          </section>
+          <section id="regime-card" class="pd-card" aria-labelledby="regime-h">
+            <h3 class="pd-card-t" id="regime-h">Market regime</h3>
+            <div id="regime-body" class="pd-box dash-skeleton"></div>
+          </section>
+          <section id="pulse-card" class="pd-card" aria-labelledby="pulse-h">
+            <h3 class="pd-card-t" id="pulse-h">Pre-market pulse</h3>
+            <p class="pd-note gap">The full note. It opens with the first part; show more for the rest.</p>
+            <div id="pulse-box" class="pd-box nr pd-clip dash-skeleton"></div>
+            <button id="pulse-toggle" class="pd-btn" type="button" aria-expanded="false" aria-controls="pulse-box" hidden>Show more</button>
+          </section>
+        </section>
+
+        <section id="open-setups" class="pd-sec" aria-labelledby="open-setups-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="open-setups-h">Open setups</h2>
+              <p class="pd-note">Frozen before the open and still proposed or entered. Open one for the full plan, to record whether you took it, or to ask about it.</p>
+            </div>
+          </div>
+          <div id="open-setups-list" class="pd-box dash-skeleton"></div>
+        </section>
+
+        <section id="inbox-card" class="pd-sec" aria-labelledby="inbox-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="inbox-h">Your decisions and notes</h2>
+              <p class="pd-note">What you recorded on this page, newest first. The scheduled runs apply each one and say what they did.</p>
+            </div>
+            <div class="pd-sec-tools"><button class="pd-btn small" type="button" id="inbox-new">Add a note</button></div>
+          </div>
+          <div id="inbox-list" class="pd-box dash-skeleton"></div>
+        </section>
+
+        <section id="day-gate" class="pd-sec" aria-labelledby="gate-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="gate-h">Day gate</h2>
+              <p class="pd-note">Check the opening numbers before taking any intraday trade. Nothing here is saved.</p>
+            </div>
+          </div>
+          <div class="pd-gate">
+            <div class="pd-card pd-gate-col" id="gate-inputs">
+              <h3 class="pd-card-t flush">Opening checks</h3>
+              <div class="pd-fields">
+                <div class="pd-field"><label for="gate-gap">NIFTY opening gap %</label><input id="gate-gap" class="pd-input" type="number" inputmode="decimal" step="any"></div>
+                <div class="pd-field"><label for="gate-vix">India VIX level</label><input id="gate-vix" class="pd-input" type="number" inputmode="decimal" step="any"></div>
+                <div class="pd-field"><label for="gate-vixmove">VIX move today %</label><input id="gate-vixmove" class="pd-input" type="number" inputmode="decimal" step="any"></div>
+              </div>
+              <div class="pd-toggles">
+                <button id="gate-event" class="pd-fchip" type="button" aria-pressed="false">High-impact event 09:15–14:30</button>
+                <button id="gate-diverge" class="pd-fchip" type="button" aria-pressed="false">Heavyweights diverging</button>
+              </div>
+              <div id="gate-verdict" class="pd-verdict" data-v="wait" role="status" aria-live="polite">
+                <div class="pd-verdict-word" id="gate-word">Enter the opening numbers</div>
+                <ul class="pd-verdict-why" id="gate-why"></ul>
+                <p class="pd-note" id="gate-vixnote" hidden></p>
+              </div>
+            </div>
+            <div class="pd-card pd-gate-col" id="size-helper">
+              <h3 class="pd-card-t flush" id="size-h">Position size</h3>
+              <div class="pd-fields">
+                <div class="pd-field"><label for="size-risk">Max risk per trade (₹)</label><input id="size-risk" class="pd-input" type="number" inputmode="decimal" step="any" min="0"></div>
+                <div class="pd-field"><label for="size-entry">Entry</label><input id="size-entry" class="pd-input" type="number" inputmode="decimal" step="any" min="0"></div>
+                <div class="pd-field"><label for="size-stop">Stop</label><input id="size-stop" class="pd-input" type="number" inputmode="decimal" step="any" min="0"></div>
+                <div class="pd-field">
+                  <span class="pd-lab" id="size-dir-l">Direction</span>
+                  <div class="pd-seg" role="group" aria-labelledby="size-dir-l">
+                    <button id="size-long" class="pd-segbtn" type="button" aria-pressed="true">Long</button>
+                    <button id="size-short" class="pd-segbtn" type="button" aria-pressed="false">Short</button>
+                  </div>
+                </div>
+              </div>
+              <p class="pd-warn" id="size-warn" role="alert" hidden></p>
+              <dl class="pd-out" id="size-out">
+                <div><dt>Quantity</dt><dd id="size-qty">—</dd></div>
+                <div><dt>Position value</dt><dd id="size-val">—</dd></div>
+                <div><dt>Loss if stopped</dt><dd id="size-loss">—</dd></div>
+                <div><dt id="size-t1-l">T1, book half</dt><dd id="size-t1">—</dd></div>
+                <div><dt id="size-t2-l">T2, trail to cost</dt><dd id="size-t2">—</dd></div>
+              </dl>
+            </div>
+          </div>
+          <p class="pd-note" id="gate-foot">These rules are a Hypothesis Lab entry, untested. Collateral is leveraged margin, not cash.</p>
+        </section>
+      </div>
+    </section>
+  </template>
+
+  <!-- News -->
+  <template id="tpl-news">
+    <section id="news" class="pd-panel" role="tabpanel" aria-labelledby="tab-news">
+      <div class="pd-stack">
+        <section id="news-top" class="pd-sec" aria-labelledby="news-top-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="news-top-h">Top of the day</h2>
+              <p class="pd-note" id="news-edition">Written each weekday morning before the pre-market pulse.</p>
+            </div>
+          </div>
+          <div id="news-top-list" class="pd-top pd-box dash-skeleton"></div>
+        </section>
+        <section id="news-feed" class="pd-sec" aria-labelledby="news-feed-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="news-feed-h">All news</h2>
+              <p class="pd-note">The last month. Every story has a short read, what it means for you, and a full read with sources when you open it.</p>
+            </div>
+          </div>
+          <div class="pd-filters" id="news-sections" role="group" aria-label="Sections"></div>
+          <div class="pd-filters">
+            <input id="news-search" class="pd-input" type="search" placeholder="Search news" aria-label="Search news" autocomplete="off">
+            <div class="pd-seg pd-viewswitch" role="group" aria-label="Market" id="news-market">
+              <button class="pd-segbtn" type="button" data-m="all" aria-pressed="true">All</button>
+              <button class="pd-segbtn" type="button" data-m="India" aria-pressed="false">India</button>
+              <button class="pd-segbtn" type="button" data-m="US" aria-pressed="false">US</button>
+              <button class="pd-segbtn" type="button" data-m="Global" aria-pressed="false">Global</button>
+            </div>
+            <button class="pd-fchip" type="button" id="news-mine" aria-pressed="false">Only my stocks</button>
+            <button class="pd-fchip" type="button" id="news-unread" aria-pressed="false">Unread only</button>
+            <span class="pd-count" id="news-count"></span>
+          </div>
+          <div id="news-list" class="pd-box dash-skeleton"></div>
+          <button id="news-more" class="pd-btn pd-more" type="button" hidden>Show more</button>
+        </section>
+      </div>
+    </section>
+  </template>
+
+  <!-- Markets -->
+  <template id="tpl-markets">
+    <section id="markets" class="pd-panel" role="tabpanel" aria-labelledby="tab-markets">
+      <div class="pd-stack">
+        <section id="gauges-sec" class="pd-sec" aria-labelledby="gauges-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="gauges-h">Markets this morning</h2>
+              <p class="pd-note" id="gauges-note">A snapshot at about 08:00 IST from the news run. Changes are against the previous snapshot. Select a figure for its history and source.</p>
+            </div>
+          </div>
+          <div id="gauges-body" class="pd-box dash-skeleton"></div>
+        </section>
+        <section id="corr-sec" class="pd-sec" aria-labelledby="corr-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="corr-h">How things move together</h2>
+              <p class="pd-note" id="corr-note">Correlation of day-to-day changes across the recorded snapshots. It needs a few weeks of history before it means much.</p>
+            </div>
+          </div>
+          <div id="corr-body" class="pd-box dash-skeleton"></div>
+        </section>
+        <section id="sector-sec" class="pd-sec" aria-labelledby="sector-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="sector-h">What moves which sector</h2>
+              <p class="pd-note">How each macro driver tends to move each sector. Darker means a stronger, better documented link. Select a cell for the mechanism and evidence, or a driver for everything it touches.</p>
+            </div>
+            <div class="pd-sec-tools"><button class="pd-fchip" type="button" id="sector-own" aria-pressed="false">Sectors you hold</button></div>
+          </div>
+          <div class="pd-legend" id="sector-legend">
+            <span><i class="pd-cell helps" style="--k:0.8">▲</i>Helps</span>
+            <span><i class="pd-cell hurts" style="--k:0.8">▼</i>Hurts</span>
+            <span><i class="pd-cell mixed" style="--k:0.8">◆</i>Mixed</span>
+            <span>● a sector you hold or watch</span>
+          </div>
+          <div id="sector-body" class="pd-box dash-skeleton"></div>
+        </section>
+        <section id="macro-sec" class="pd-sec" aria-labelledby="macro-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="macro-h">Macro map</h2>
+              <p class="pd-note">India, the US and Japan, the central banks, and what it means for your book. Rewritten every Sunday.</p>
+            </div>
+            <div class="pd-sec-tools"><button class="pd-btn small" type="button" id="macro-ask" hidden>Ask about the macro map</button></div>
+          </div>
+          <article class="pd-article" aria-labelledby="macro-title">
+            <nav id="macro-toc" class="pd-toc" aria-label="On this page" hidden></nav>
+            <div id="macro-body" class="pd-box nr dash-skeleton"></div>
+          </article>
+        </section>
+      </div>
+    </section>
+  </template>
+
+  <!-- Portfolio -->
+  <template id="tpl-portfolio">
+    <section id="portfolio" class="pd-panel" role="tabpanel" aria-labelledby="tab-portfolio">
+      <div class="pd-stack">
+        <section id="portfolio-attn" class="pd-attn" aria-label="Needs your attention">
+          <span class="pd-attn-label" id="attn-label">Needs your attention</span>
+          <div id="attn-items" class="pd-attn-items dash-skeleton"></div>
+        </section>
+
+        <section id="overview" class="pd-sec" aria-labelledby="overview-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="overview-h">Overview</h2>
+              <p class="pd-note" id="overview-note">Totals are in rupees, with the US book at the latest dollar rate.</p>
+            </div>
+          </div>
+          <div class="pd-kpis" id="portfolio-kpis">
+            <div class="pd-kpi hero" id="kpi-total">
+              <div class="pd-kpi-label">Total portfolio</div>
+              <div class="pd-kpi-value dash-skeleton" id="kpi-total-v">—</div>
+              <div class="pd-kpi-sub" id="kpi-total-s"></div>
+            </div>
+            <div class="pd-kpi" id="kpi-india">
+              <div class="pd-kpi-label">Upstox India book</div>
+              <div class="pd-kpi-value dash-skeleton" id="kpi-india-v">—</div>
+              <div class="pd-kpi-sub" id="kpi-india-s"></div>
+            </div>
+            <div class="pd-kpi" id="kpi-us">
+              <div class="pd-kpi-label">INDmoney US book</div>
+              <div class="pd-kpi-value dash-skeleton" id="kpi-us-v">—</div>
+              <div class="pd-kpi-sub" id="kpi-us-s"></div>
+            </div>
+            <div class="pd-kpi" id="kpi-else">
+              <div class="pd-kpi-label">Held elsewhere</div>
+              <div class="pd-kpi-value dash-skeleton" id="kpi-else-v">—</div>
+              <div class="pd-kpi-sub" id="kpi-else-s"></div>
+            </div>
+            <div class="pd-kpi" id="kpi-ved">
+              <div class="pd-kpi-label">Vedanta group, share of India book</div>
+              <div class="pd-kpi-value dash-skeleton" id="kpi-ved-v">—</div>
+              <div class="pd-kpi-sub" id="kpi-ved-s"></div>
+            </div>
+            <div class="pd-kpi" id="kpi-top">
+              <div class="pd-kpi-label">Largest position, share of total</div>
+              <div class="pd-kpi-value dash-skeleton" id="kpi-top-v">—</div>
+              <div class="pd-kpi-sub" id="kpi-top-s"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="themes-card" class="pd-sec" aria-labelledby="themes-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="themes-h">Where the money is</h2>
+              <p class="pd-note" id="themes-note">Share of the whole portfolio by theme, every book in rupees at the latest dollar rate. The Vedanta tickers are one position, so they are one bar. The largest bar is highlighted.</p>
+            </div>
+          </div>
+          <div class="pd-card"><div id="theme-chart" class="pd-chart dash-skeleton"></div></div>
+        </section>
+
+        <section id="waiting-card" class="pd-sec" aria-labelledby="waiting-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="waiting-h">Waiting on you</h2>
+              <p class="pd-note">Classification proposals from the weekly review. Confirm or change each one here; the next weekly review applies it.</p>
+            </div>
+          </div>
+          <div class="pd-card"><div id="waiting-body" class="pd-box dash-skeleton"></div></div>
+        </section>
+
+        <section id="holdings-card" class="pd-sec" aria-labelledby="holdings-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="holdings-h">Holdings</h2>
+              <p class="pd-note">Values are in each stock's own currency. P&amp;L is current value against the amount invested. Select a holding for its thesis, news and notes.</p>
+            </div>
+            <div class="pd-sec-tools"><input id="holdings-search" class="pd-input" type="search" placeholder="Search holdings" aria-label="Search holdings" autocomplete="off"></div>
+          </div>
+          <div id="holdings-state" class="pd-box dash-skeleton"></div>
+          <div id="holdings-wrap" class="pd-tablewrap" role="region" aria-label="Holdings table" tabindex="0" hidden>
+            <table id="holdings-table" class="pd-table"></table>
+          </div>
+          <p id="holdings-empty" class="pd-empty" hidden>No holdings match that search.</p>
+        </section>
+
+        <section id="watch-card" class="pd-sec" aria-labelledby="watch-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="watch-h">Watchlist</h2>
+              <p class="pd-note">Not held. Select a name for its catalysts and news.</p>
+            </div>
+          </div>
+          <div id="watch-state" class="pd-box dash-skeleton"></div>
+          <div id="watch-wrap" class="pd-tablewrap short" role="region" aria-label="Watchlist table" tabindex="0" hidden>
+            <table id="watch-table" class="pd-table"></table>
+          </div>
+        </section>
+
+        <section id="collateral-card" class="pd-sec" aria-labelledby="collateral-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="collateral-h">Collateral and stress test</h2>
+              <p class="pd-note">Straight from the Notion page. Collateral is leveraged margin, not cash.</p>
+            </div>
+          </div>
+          <div class="pd-card">
+            <div id="collateral-body" class="pd-box nr pd-clip dash-skeleton"></div>
+            <button id="collateral-toggle" class="pd-btn" type="button" aria-expanded="false" aria-controls="collateral-body" hidden>Show more</button>
+          </div>
+        </section>
+      </div>
+    </section>
+  </template>
+
+  <!-- Trades and research -->
+  <template id="tpl-research">
+    <section id="research" class="pd-panel" role="tabpanel" aria-labelledby="tab-research">
+      <div class="pd-stack">
+        <section id="stats-section" class="pd-sec" aria-labelledby="stats-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="stats-h">Setup record</h2>
+              <p class="pd-note" id="stats-note"></p>
+            </div>
+          </div>
+          <div class="pd-kpis" id="stats-kpis">
+            <div class="pd-kpi" id="kpi-frozen">
+              <div class="pd-kpi-label">Setups frozen</div>
+              <div class="pd-kpi-value dash-skeleton" id="kpi-frozen-v">—</div>
+              <div class="pd-kpi-sub" id="kpi-frozen-s"></div>
+            </div>
+            <div class="pd-kpi" id="kpi-open">
+              <div class="pd-kpi-label">Open now</div>
+              <div class="pd-kpi-value dash-skeleton" id="kpi-open-v">—</div>
+              <div class="pd-kpi-sub" id="kpi-open-s"></div>
+            </div>
+            <div class="pd-kpi" id="kpi-trig">
+              <div class="pd-kpi-label">Triggered validly</div>
+              <div class="pd-kpi-value dash-skeleton" id="kpi-trig-v">—</div>
+              <div class="pd-kpi-sub" id="kpi-trig-s"></div>
+            </div>
+            <div class="pd-kpi" id="kpi-rej">
+              <div class="pd-kpi-label">Candidates rejected</div>
+              <div class="pd-kpi-value dash-skeleton" id="kpi-rej-v">—</div>
+              <div class="pd-kpi-sub" id="kpi-rej-s"></div>
+            </div>
+            <div class="pd-kpi" id="kpi-avgr">
+              <div class="pd-kpi-label">Average theoretical R</div>
+              <div class="pd-kpi-value dash-skeleton" id="kpi-avgr-v">—</div>
+              <div class="pd-kpi-sub" id="kpi-avgr-s"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="days-card" class="pd-sec" aria-labelledby="days-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="days-h">Day by day</h2>
+              <p class="pd-note">Each trading day: the regime the pulse read, the setups frozen and how they ended, and the candidates passed on. Select a day to read the pulse and every setup and candidate together.</p>
+            </div>
+          </div>
+          <div id="days-list" class="pd-box dash-skeleton"></div>
+          <button id="days-more" class="pd-btn pd-more" type="button" hidden>Show earlier days</button>
+        </section>
+
+        <section id="props-card" class="pd-sec" aria-labelledby="props-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="props-h">Open proposals</h2>
+              <p class="pd-note">Rule changes suggested by the Brain pages. Decide them here, or leave them for the Saturday review. A decision goes to the inbox, and the review applies it with a dated Playbook change log line.</p>
+            </div>
+          </div>
+          <div id="props-list" class="pd-box dash-skeleton"></div>
+        </section>
+
+        <section id="ledger-card" class="pd-sec" aria-labelledby="ledger-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="ledger-h">Trading ledger</h2>
+              <p class="pd-note">Every setup is frozen before the open. Select a row for its full plan, the result, your fill and its notes.</p>
+            </div>
+          </div>
+          <div class="pd-filters" id="ledger-filters">
+            <input id="ledger-search" class="pd-input" type="search" placeholder="Search setups" aria-label="Search setups" autocomplete="off">
+            <div class="pd-filters" id="ledger-status" role="group" aria-label="Status"></div>
+            <span class="pd-count" id="ledger-count"></span>
+          </div>
+          <div id="ledger-state" class="pd-box dash-skeleton"></div>
+          <div id="ledger-wrap" class="pd-tablewrap" role="region" aria-label="Trading ledger table" tabindex="0" hidden>
+            <table id="ledger-table" class="pd-table"></table>
+          </div>
+        </section>
+
+        <section id="pipeline-card" class="pd-sec" aria-labelledby="pipeline-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="pipeline-h">Strategy pipeline</h2>
+              <p class="pd-note">Strategy hypotheses by stage. Select one for its statement, evidence, decision log and notes.</p>
+            </div>
+          </div>
+          <div id="pipe-board" class="pd-pipe pd-box dash-skeleton"></div>
+        </section>
+
+        <section id="rejected-card" class="pd-sec" aria-labelledby="rejected-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="rejected-h">Rejected trades</h2>
+              <p class="pd-note">Trades passed on, and what the price did afterwards. Select a row to read all of it.</p>
+            </div>
+          </div>
+          <div class="pd-filters">
+            <input id="rej-search" class="pd-input" type="search" placeholder="Search rejected trades" aria-label="Search rejected trades" autocomplete="off">
+            <button class="pd-fchip" type="button" id="rej-unscored" aria-pressed="false">Not scored yet</button>
+            <span class="pd-count" id="rej-count"></span>
+          </div>
+          <div id="rej-state" class="pd-box dash-skeleton"></div>
+          <div id="rej-wrap" class="pd-tablewrap short" role="region" aria-label="Rejected trades table" tabindex="0" hidden>
+            <table id="rej-table" class="pd-table"></table>
+          </div>
+        </section>
+      </div>
+    </section>
+  </template>
+
+  <!-- Ideas -->
+  <template id="tpl-ideas">
+    <section id="ideas" class="pd-panel" role="tabpanel" aria-labelledby="tab-ideas">
+      <div class="pd-stack">
+        <section id="radar-sec" class="pd-sec" aria-labelledby="radar-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="radar-h">Theme radar</h2>
+              <p class="pd-note">Sectors and themes that could matter over three years, with what would kill each one. Nothing here is a buy signal. Select a theme for the full read, or ask for deeper research.</p>
+            </div>
+          </div>
+          <div class="pd-filters" id="radar-filters" role="group" aria-label="Filter themes">
+            <button class="pd-fchip" type="button" data-f="notown" aria-pressed="false">Not owned yet</button>
+            <button class="pd-fchip" type="button" data-f="high" aria-pressed="false">High potential</button>
+            <button class="pd-fchip" type="button" data-f="India" aria-pressed="false">India</button>
+            <button class="pd-fchip" type="button" data-f="US" aria-pressed="false">US</button>
+            <span class="pd-count" id="radar-count"></span>
+          </div>
+          <div id="radar-list" class="pd-box dash-skeleton"></div>
+        </section>
+        <section id="money-sec" class="pd-sec" aria-labelledby="money-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="money-h">Money moves</h2>
+              <p class="pd-note">Your mutual funds and where new money could go. Work the numbers with the calculators, then read the full note.</p>
+            </div>
+            <div class="pd-sec-tools"><button class="pd-btn small" type="button" id="money-ask" hidden>Ask about my mutual funds</button></div>
+          </div>
+          <div class="pd-calcs" id="money-calcs">
+            <div class="pd-calc" id="calc-cagr">
+              <h3>What your return is per year</h3>
+              <div class="pd-fields">
+                <div class="pd-field"><label for="cagr-gain">Total gain %</label><input id="cagr-gain" class="pd-input" type="number" inputmode="decimal" step="any" value="13"></div>
+                <div class="pd-field"><label for="cagr-years">Years held</label><input id="cagr-years" class="pd-input" type="number" inputmode="decimal" step="any" value="5"></div>
+              </div>
+              <div class="res" role="status" aria-live="polite"><span class="big" id="cagr-out">—</span><p id="cagr-note"></p></div>
+            </div>
+            <div class="pd-calc" id="calc-drag">
+              <h3>What fund costs take over time</h3>
+              <div class="pd-fields">
+                <div class="pd-field"><label for="drag-amt">Amount (₹)</label><input id="drag-amt" class="pd-input" type="number" inputmode="decimal" step="any" value="850000"></div>
+                <div class="pd-field"><label for="drag-ret">Return before costs %/yr</label><input id="drag-ret" class="pd-input" type="number" inputmode="decimal" step="any" value="11"></div>
+                <div class="pd-field"><label for="drag-gap">Extra yearly cost %</label><input id="drag-gap" class="pd-input" type="number" inputmode="decimal" step="any" value="0.8"></div>
+                <div class="pd-field"><label for="drag-yrs">Years</label><input id="drag-yrs" class="pd-input" type="number" inputmode="decimal" step="any" value="10"></div>
+              </div>
+              <div class="res" role="status" aria-live="polite"><span class="big" id="drag-out">—</span><p id="drag-note"></p></div>
+            </div>
+            <div class="pd-calc" id="calc-tax">
+              <h3>Tax if you redeem equity funds</h3>
+              <div class="pd-fields">
+                <div class="pd-field"><label for="tax-gain">Gain held over a year (₹)</label><input id="tax-gain" class="pd-input" type="number" inputmode="decimal" step="any" value="98000"></div>
+                <div class="pd-field"><label for="tax-st">Gain held a year or less (₹)</label><input id="tax-st" class="pd-input" type="number" inputmode="decimal" step="any" value="0"></div>
+                <div class="pd-field"><label for="tax-ltcg">Long-term rate %</label><input id="tax-ltcg" class="pd-input" type="number" inputmode="decimal" step="any" value="12.5"></div>
+                <div class="pd-field"><label for="tax-ex">Yearly exemption (₹)</label><input id="tax-ex" class="pd-input" type="number" inputmode="decimal" step="any" value="125000"></div>
+                <div class="pd-field"><label for="tax-stcg">Short-term rate %</label><input id="tax-stcg" class="pd-input" type="number" inputmode="decimal" step="any" value="20"></div>
+              </div>
+              <div class="res" role="status" aria-live="polite"><span class="big" id="tax-out">—</span><p id="tax-note"></p></div>
+            </div>
+          </div>
+          <p class="pd-note">Defaults: about ₹8.5 lakh, a 13% total gain over 5 years, and the equity-fund tax rules from the July 2024 Budget (12.5% above ₹1.25 lakh a year long-term, 20% short-term; cess and surcharge not included). Check the rates in the note below before acting; they change.</p>
+          <article class="pd-article" aria-labelledby="money-title">
+            <nav id="money-toc" class="pd-toc" aria-label="On this page" hidden></nav>
+            <div id="money-body" class="pd-box nr dash-skeleton"></div>
+          </article>
+        </section>
+        <section id="opps-sec" class="pd-sec" aria-labelledby="opps-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="opps-h">Opportunities and themes in the news</h2>
+              <p class="pd-note">News Desk pieces on where money could go and on themes worth watching.</p>
+            </div>
+          </div>
+          <div id="opps-list" class="pd-news pd-box dash-skeleton"></div>
+        </section>
+      </div>
+    </section>
+  </template>
+
+  <!-- Log -->
+  <template id="tpl-log">
+    <section id="log" class="pd-panel" role="tabpanel" aria-labelledby="tab-log">
+      <div class="pd-stack">
+        <section id="log-card" class="pd-sec" aria-labelledby="log-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="log-h">Pulse and review log</h2>
+              <p class="pd-note">Newest first. Select an entry to read the whole note.</p>
+            </div>
+            <div class="pd-sec-tools"><input id="log-search" class="pd-input" type="search" placeholder="Search the log" aria-label="Search the log" autocomplete="off"></div>
+          </div>
+          <div class="pd-logbar" id="log-filter" role="group" aria-label="Filter by type">
+            <button class="pd-fchip" type="button" data-f="all" aria-pressed="true">All</button>
+            <button class="pd-fchip" type="button" data-f="Pre-market pulse" aria-pressed="false">Pre-market</button>
+            <button class="pd-fchip" type="button" data-f="Post-market review" aria-pressed="false">Post-market</button>
+            <button class="pd-fchip" type="button" data-f="Weekly review" aria-pressed="false">Weekly</button>
+            <button class="pd-fchip" type="button" data-f="Monthly IC" aria-pressed="false">Monthly</button>
+          </div>
+          <div id="log-list" class="pd-box dash-skeleton"></div>
+          <button id="log-more" class="pd-btn pd-more" type="button" hidden>Show more</button>
+        </section>
+      </div>
+    </section>
+  </template>
+
+  <!-- Brain -->
+  <template id="tpl-brain">
+    <section id="brain" class="pd-panel" role="tabpanel" aria-labelledby="tab-brain">
+      <div class="pd-stack">
+        <section id="brain-section" class="pd-sec" aria-labelledby="brain-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="brain-h">Brain</h2>
+              <p class="pd-note">Your investing notes from the Brain section in Notion, read live. Pick a page, or ask about it.</p>
+            </div>
+          </div>
+          <div class="pd-brain">
+            <nav id="brain-rail" class="pd-rail" aria-label="Brain pages">
+              <p class="pd-rail-label">Pages</p>
+              <div id="brain-list" class="pd-rail-list pd-box dash-skeleton"></div>
+            </nav>
+            <article id="brain-main" class="pd-article" aria-labelledby="brain-title">
+              <div class="pd-article-head">
+                <h3 class="pd-article-title" id="brain-title"></h3>
+                <button class="pd-btn small" type="button" id="brain-ask" hidden>Ask about this page</button>
+              </div>
+              <nav id="brain-toc" class="pd-toc" aria-label="On this page" hidden></nav>
+              <div id="brain-body" class="pd-box nr dash-skeleton"></div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </section>
+  </template>
+
+  <div id="pd-sheet-root"></div>
+  <div class="pd-toast" id="pd-toast" role="status" aria-live="polite" hidden></div>
+</div>

@@ -1,0 +1,75 @@
+<title>Portfolio Desk</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&display=swap">
+<style>
+/* Layout: one centred column under a sticky pill tab bar; detail opens in a side sheet (bottom sheet on phones).
+   Tonal teal surfaces in the Material 3 Expressive manner; serif for headlines and big figures, flexible sans for everything you operate. */
+:root {
+  --bg: #f3f7f6;
+  --panel: #fbfdfc;
+  --fg: #141c1b;
+  --fg-muted: #4c5957;
+  --line: #bcc8c6;
+  --primary: #00696b;
+  --on-primary: #ffffff;
+  --primary-c: #c6ebe7;
+  --on-primary-c: #00201f;
+  --tertiary: #8a5200;
+  --tertiary-c: #fde3c4;
+  --on-tertiary-c: #2c1700;
+  --ok: #1d7a45;
+  --warn: #9a6100;
+  --bad: #b3261e;
+  --chart-muted: #9fb1ae;
+  --scrim: rgba(9, 20, 19, 0.42);
+  --shadow-2: 0 2px 6px rgba(9, 20, 19, 0.12), 0 8px 28px rgba(9, 20, 19, 0.12);
+  --s1: #00696b; --s2: #a0560f; --s3: #4a5bb5; --s4: #b0405f; --s5: #5f7a1c; --s6: #2f7fb0; --s7: #7d4a96; --s8: #5d6b72;
+  --font-ui: "Roboto Flex", "Roboto", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --fs-cap: 0.8125rem;
+  --fs-body: 0.9375rem;
+  --fs-head: 1.0625rem;
+  --fs-title: 1.5rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1514; --panel: #151d1c; --fg: #dbe5e3; --fg-muted: #a0aeab; --line: #3d4846;
+    --primary: #7fd4d0; --on-primary: #003736; --primary-c: #1d4c4a; --on-primary-c: #cdeeea;
+    --tertiary: #f2bb73; --tertiary-c: #553711; --on-tertiary-c: #ffdcb6;
+    --ok: #79d597; --warn: #efbd68; --bad: #ffb4ab; --chart-muted: #5b6d6a; --scrim: rgba(0, 0, 0, 0.6);
+    --shadow-2: 0 2px 6px rgba(0, 0, 0, 0.4), 0 8px 28px rgba(0, 0, 0, 0.45);
+    --s1: #7fd4d0; --s2: #f2b06c; --s3: #a9b6ff; --s4: #ff9fb6; --s5: #b6d36e; --s6: #83c5ef; --s7: #d6a6ec; --s8: #a9b8bf;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1514; --panel: #151d1c; --fg: #dbe5e3; --fg-muted: #a0aeab; --line: #3d4846;
+  --primary: #7fd4d0; --on-primary: #003736; --primary-c: #1d4c4a; --on-primary-c: #cdeeea;
+  --tertiary: #f2bb73; --tertiary-c: #553711; --on-tertiary-c: #ffdcb6;
+  --ok: #79d597; --warn: #efbd68; --bad: #ffb4ab; --chart-muted: #5b6d6a; --scrim: rgba(0, 0, 0, 0.6);
+  --shadow-2: 0 2px 6px rgba(0, 0, 0, 0.4), 0 8px 28px rgba(0, 0, 0, 0.45);
+  --s1: #7fd4d0; --s2: #f2b06c; --s3: #a9b6ff; --s4: #ff9fb6; --s5: #b6d36e; --s6: #83c5ef; --s7: #d6a6ec; --s8: #a9b8bf;
+  color-scheme: dark;
+}
+html { background: var(--bg); }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-ui);
+  font-size: var(--fs-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 2.5rem;
+  -webkit-font-smoothing: antialiased;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
+.dash-skeleton { position: relative; color: transparent !important; border-radius: 12px; background: linear-gradient(90deg, var(--pd-t2, #e6eceb) 0%, var(--pd-t3, #dde4e3) 50%, var(--pd-t2, #e6eceb) 100%); background-size: 200% 100%; min-height: 1.4em; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes pd-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+  .dash-skeleton { animation: pd-shimmer 1.4s linear infinite; }
+}
+</style>
+<style>
