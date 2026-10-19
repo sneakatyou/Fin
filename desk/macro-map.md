@@ -373,7 +373,7 @@ Read this first: correlations change by regime. A relationship that held in one 
 - Evidence: Moderate.
 
 ## What it means for your book
-Context, not advice; nothing here changes a rule.
+Nothing here changes a rule; the calls built on it carry their own conviction and odds.
 - **Collateral (Vedanta group about 33.8% and Indian Bank 23.5% of the Upstox book, about 57% together).** The channels are: the Nifty and FII flows (margin value); LME aluminium, zinc and silver (Vedanta earnings); oil and the rupee; and the RBI path (Indian Bank's margin gains against bond losses; his own note names treasury losses and deposit repricing as the falsifier). Inference: both legs need India to hold up while metals hold. In the week to 9 Oct Nifty Metal fell 3.69% while PSU banks rose 2.38%, so they do not always move together.
 - **The AI-hardware-heavy US book (about 56% of the INDmoney book).** It is the most sensitive to the 10-year yield, hot CPI prints and AI-credit stress. His weekly review records the INDmoney book down 14.7% in the week to 16 Oct. The yen-carry and credit channels hit this sleeve first.
 - **GOOG and INTC.** At handoff figures, about USD 100k of Alphabet (vested plus unvested) and USD 40k of Intel sit outside both brokers. Both share the discount-rate risk. Alphabet reports on 28 Oct, the day of the FOMC decision; Intel on 29 Oct.

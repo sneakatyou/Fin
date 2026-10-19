@@ -2,7 +2,7 @@
 
 Shashank's personal investing research system: the dashboard he reads every day, and the notes on how it is fed.
 
-Nothing here places orders or touches a brokerage account. It is research for his own decisions, not advice.
+Every call comes with a conviction level, the odds and the downside, and the runs are scored on how well those odds hold up. Nothing here places orders or touches a brokerage account; broker access is read-only.
 
 ## How it fits together
 
@@ -23,7 +23,7 @@ Scheduled Claude runs (claude.ai)              Notion: Trading Research System  
 ```
 
 - **Notion is the single source of truth.** The scheduled runs write to it. The dashboard reads it, and writes only new rows in the Decisions Inbox; the runs apply those under the Playbook's rules (frozen PRE fields are never changed).
-- **Two assistants, one record.** Claude runs the schedule; ChatGPT's proposals and fact checks enter only as Decisions Inbox rows with Author ChatGPT, which a Claude run freezes, rejects or checks. Every News Desk, Market Gauges and Theme Radar row carries a source grade (Primary verified, Secondary only or Unverified), Ledger and Hypothesis Lab rows carry their author, and every run leaves a Run Log row saying what it wrote and what it could not do. The rules are in `docs/agent-protocol.md` and on the "Agent protocol: Claude and ChatGPT" page in Notion.
+- **Two assistants, one record.** Claude runs the schedule; ChatGPT's proposals and fact checks enter only as Decisions Inbox rows with Author ChatGPT, which a Claude run freezes, rejects or checks. Every News Desk, Market Gauges and Theme Radar row carries a source grade (Primary verified, Secondary only or Unverified), Ledger and Hypothesis Lab rows carry their author, setups carry their frozen odds (conviction, chance of triggering, chance the target comes first, expected R) and themes their three-year odds, and every run leaves a Run Log row saying what it wrote and what it could not do. The rules are in `docs/agent-protocol.md` and on the "Agent protocol: Claude and ChatGPT" page in Notion.
 - **The dashboard** is a private claude.ai artifact: https://claude.ai/artifact/7zyNJLRe8y96unh2NLNr43 . It declares two capabilities: the Notion connector (`notion-query-data-sources`, `notion-fetch`, `notion-create-pages`) and Ask Claude (`sample`), which answers questions on the viewer's own Claude account.
 - The earlier read-only version (claude.ai Dashboard type) is at https://claude.ai/artifact/K5cUrrGok9cnM3fhVJVzeJ ; its files are in `dashboard/v2-dashboard-type/`.
 - **Google Drive** holds a mirror of the Strategy Playbook. The Google Sheet "Trading Portfolio Book" is empty and unused.

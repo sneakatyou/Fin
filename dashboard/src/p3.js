@@ -2,15 +2,28 @@
 /* ===== Detail sheets ===== */
 const DIR_TONE = (v) => (v === 'Long' ? 'ok' : v === 'Short' ? 'bad' : 'muted');
 const firstSentence = (t) => { const m = /^[\s\S]*?[.!?](?=\s|$)/.exec(t); return m ? m[0] : t; };
+/* The call frozen with a setup: conviction, the chance it triggers, the chance the target comes before the stop, expected value. */
+const ODDS_KEYS = ['PRE Conviction', 'PRE P trigger pct', 'PRE P target pct', 'PRE Expected R'];
+const ODDS_LABEL = { 'PRE P trigger pct': 'Chance it triggers (%)', 'PRE P target pct': 'Chance the target comes before the stop (%)', 'PRE Expected R': 'Expected value if triggered (R)' };
+const CONV_TONE = { High: 'ok', Medium: 'warn', Low: 'muted' };
+const convChip = (v) => (v ? chip(v + ' conviction', CONV_TONE[v] || 'muted') : null);
+function oddsLine(r) {
+  const p1 = num(r['PRE P trigger pct']), p2 = num(r['PRE P target pct']), ev = num(r['PRE Expected R']);
+  const bits = [];
+  if (p1 !== null) bits.push(Math.round(p1) + '% it triggers');
+  if (p2 !== null) bits.push(Math.round(p2) + '% target before stop');
+  if (ev !== null) bits.push((ev > 0 ? '+' : '') + ev.toFixed(2) + 'R expected');
+  return bits.join(' · ');
+}
 function openSetup(r, list) {
   const id = r['Setup ID'];
   const keys = Object.keys(r);
-  const pre = keys.filter((k) => /^PRE /.test(k));
+  const pre = ODDS_KEYS.filter((k) => k in r).concat(keys.filter((k) => /^PRE /.test(k) && !ODDS_KEYS.includes(k)));
   const post = keys.filter((k) => /^POST /.test(k)).concat(['Data quality'].filter((k) => k in r));
   const other = keys.filter((k) => !pre.includes(k) && !post.includes(k) && k !== 'Setup ID' && k !== 'Instrument');
   const strip = (k) => k.replace(/^(PRE|POST) /, '');
   openSheet({
-    kicker: [chip(id, 'muted'), r.Direction && chip(r.Direction, DIR_TONE(r.Direction)), r.Status && chip(r.Status, 'muted'), r.Market && chip(r.Market, 'sec'), r.Author && chip('By ' + r.Author, 'sec')],
+    kicker: [chip(id, 'muted'), r.Direction && chip(r.Direction, DIR_TONE(r.Direction)), r.Status && chip(r.Status, 'muted'), convChip(r['PRE Conviction']), r.Market && chip(r.Market, 'sec'), r.Author && chip('By ' + r.Author, 'sec')],
     title: firstSentence(clean(r.Instrument)) || id,
     nav: list ? { list, index: list.indexOf(r), open: openSetup } : null,
     build: (b) => {
@@ -25,7 +38,7 @@ function openSetup(r, list) {
       if (lk) acts.append(lk);
       b.append(acts);
       if (clean(r.Instrument)) b.append(sec('Instrument', el('p', 'pd-pre', clean(r.Instrument))));
-      b.append(sec('Plan, frozen before the open', fieldsKv(r, pre, { label: strip }) || empty('No plan fields recorded.')));
+      b.append(sec('Plan, frozen before the open', fieldsKv(r, pre, { label: (k) => ODDS_LABEL[k] || strip(k) }) || empty('No plan fields recorded.')));
       b.append(sec('What happened', fieldsKv(r, post, { label: strip }) || empty('Not scored yet. The post-market review scores it after the close.')));
       const o = fieldsKv(r, other);
       if (o) b.append(sec('Details', o));
@@ -330,6 +343,7 @@ function setupCard(r, i, n, list) {
   head.append(el('strong', 'pd-setup-id', id));
   if (r.Direction) head.append(chip(r.Direction, DIR_TONE(r.Direction)));
   if (r.Status) head.append(chip(r.Status, 'muted'));
+  if (r['PRE Conviction']) head.append(convChip(r['PRE Conviction']));
   tg.append(head);
   const meta = el('span', 'pd-setup-meta');
   const bits = [r.Horizon, clean(r['Setup family']), r.Market, r['date:Frozen at:start'] ? 'Frozen ' + dayTimeStr(r['date:Frozen at:start']) : ''].filter(Boolean);
@@ -347,6 +361,8 @@ function setupCard(r, i, n, list) {
   body.id = bodyId;
   body.hidden = !isOpen;
   const grid = el('div', 'pd-blks');
+  const odds = oddsLine(r);
+  if (odds) { const ob = el('div', 'pd-blk'); ob.append(el('div', 'pd-blk-l', 'The odds'), el('div', 'pd-blk-v', odds)); grid.append(ob); }
   grid.append(blk('Trigger', 'PRE Trigger'), blk('Entry zone', 'PRE Entry zone'), blk('Stop', 'PRE Stop'), blk('Targets', 'PRE Targets'), blk('Time stop', 'PRE Time stop'));
   const acts = el('div', 'pd-sheet-actions');
   const more = el('button', 'pd-btn small tonal', 'Full plan, fill and notes');

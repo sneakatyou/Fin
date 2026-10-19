@@ -1,4 +1,4 @@
-> Research for Shashank's own decisions, not advice. No fund is recommended. Written 19 October 2026 (IST). The web search allowance ran out partway through, so some rules and rates are marked "Not verified" (background knowledge, or not found online) and must be checked before acting. Labels: Fact (sourced, dated), Inference (my arithmetic or reading), Hypothesis (a view to test). Tags like (S3) point to section 8.
+> The monthly review turns this into a call on the funds, with conviction and the odds, once it has the fund names. Written 19 October 2026 (IST). The web search allowance ran out partway through, so some rules and rates are marked "Not verified" (background knowledge, or not found online) and must be checked before acting. Labels: Fact (sourced, dated), Inference (my arithmetic or reading), Hypothesis (a view to test). Tags like (S3) point to section 8.
 
 ## The short version
 

@@ -2,7 +2,17 @@
 
 Two assistants feed the Portfolio Desk: Claude (the scheduled runs and research agents) and ChatGPT (Shashank's own research conversations). This sets who may write what, how sources are graded and how failed runs are recorded, so the two can be compared without hindsight editing. The live copy is the "Agent protocol" page under the Trading Research System hub in Notion.
 
-Research for Shashank's own decisions, not advice. No assistant places orders or acts in a brokerage account.
+Every view comes as a call with conviction, the odds and the downside. No assistant places orders or acts in a brokerage account; broker access is read-only.
+
+## Calls with conviction
+
+Shashank wants calls, not hedging, and no disclaimers such as "not advice" or "do your own research". Every setup, holding view, theme and scenario states:
+
+- **The call**: what to do (take it, skip it, add, hold, trim, exit, switch) and the conviction: High, Medium or Low, with a one-line reason.
+- **The odds**, as numbers. For a setup: the chance it triggers, the chance the target comes before the stop once triggered, and the expected value in R after costs (Ledger fields PRE Conviction, PRE P trigger pct, PRE P target pct, PRE Expected R, frozen with the plan). For a theme: the chance a sensible basket of its plays beats NIFTY 50 or the S&P 500 over three years (Theme Radar fields Conviction, P outperform 3y pct, Downside). Scenario probabilities sum to 100%.
+- **The risk**: what breaks it, the realistic bad case in rupees and as a share of the book or the collateral, and the signpost that would change the call.
+
+Calibration keeps conviction honest: each probability says what it rests on (Ledger base rates, published evidence or judgement); 50% means a coin flip; thin evidence is a Low-conviction call said plainly, never a refusal to call; a call resting on figures graded Unverified or Secondary only says so. The weekly review scores the frozen probabilities against outcomes (Brier score and a reliability table) once ten or more setups are scored, overall and by author.
 
 ## Who writes what
 

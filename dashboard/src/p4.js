@@ -806,19 +806,27 @@ function themeCard(r, list) {
   for (let i = 1; i <= 3; i++) mtr.append(el('i', i <= (POT[r.Potential] || 0) ? 'on' : null));
   pot.append(mtr, el('span', null, (r.Potential || '—') + ' potential over 3 years'));
   b.append(pot);
+  const call = themeCall(r);
+  if (r.Conviction || call) { const c = el('div', 'pd-sheet-kicker'); if (r.Conviction) c.append(convChip(r.Conviction)); if (call) c.append(el('span', null, call)); b.append(c); }
   if (clean(r['Why it could be big'])) b.append(el('div', 'why', clean(r['Why it could be big'])));
   if (clean(r['What would kill it'])) b.append(el('div', 'kill', 'What would kill it: ' + clean(r['What would kill it'])));
   b.append(notOwned(r) ? chip('Not owned yet', 'warn') : chip('You own: ' + clean(r['Already own']).slice(0, 60), 'tk own'));
   b.addEventListener('click', () => openTheme(r, list));
   return b;
 }
+const benchOf = (r) => (r.Market === 'India' ? 'NIFTY 50' : 'the S&P 500');
+function themeCall(r) {
+  const p = num(r['P outperform 3y pct']);
+  return p === null ? '' : Math.round(p) + '% chance to beat ' + benchOf(r) + ' over 3 years';
+}
 function openTheme(r, list) {
   openSheet({
-    kicker: [r.Stage && chip(r.Stage, 'muted'), r.Potential && chip(r.Potential + ' potential'), r.Market && chip(r.Market, 'sec'), r.Evidence && chip('Evidence: ' + r.Evidence, 'muted'), verChip(r, true), r.Author && chip('By ' + r.Author, 'sec')],
+    kicker: [r.Stage && chip(r.Stage, 'muted'), convChip(r.Conviction), r.Potential && chip(r.Potential + ' potential'), r.Market && chip(r.Market, 'sec'), r.Evidence && chip('Evidence: ' + r.Evidence, 'muted'), verChip(r, true), r.Author && chip('By ' + r.Author, 'sec')],
     title: clean(r.Theme),
     nav: list ? { list, index: list.indexOf(r), open: openTheme } : null,
     build: (b) => {
-      ['Why it could be big', 'What would kill it', 'How to get exposure', 'Already own', 'Signals to watch'].forEach((k) => { if (clean(r[k])) b.append(sec(k, el('p', 'pd-pre', clean(r[k])))); });
+      if (themeCall(r)) b.append(sec('The call', el('p', null, themeCall(r) + (r.Conviction ? ', ' + r.Conviction.toLowerCase() + ' conviction.' : '.'))));
+      ['Why it could be big', 'What would kill it', 'Downside', 'How to get exposure', 'Already own', 'Signals to watch'].forEach((k) => { if (clean(r[k])) b.append(sec(k, el('p', 'pd-pre', clean(r[k])))); });
       b.append(pageSection(r.url, 'The full read', { none: 'No longer read yet.' }));
       const srcs = sourcesList(r.Sources);
       if (srcs) b.append(sec('Sources', srcs));
