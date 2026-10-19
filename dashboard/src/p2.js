@@ -354,6 +354,7 @@ function inboxItem(r) {
   if (r.Decision) top.append(chip(r.Decision));
   top.append(chip(r.pending ? 'Saving' : STATUS_TEXT[r.Status] || r.Status || 'Waiting for a run', r.pending ? 'muted' : STATUS_TONE[r.Status] || ''));
   top.append(el('span', null, dayTimeStr(r.Created || r.createdTime)));
+  if (r.Author && r.Author !== 'Shashank') top.append(chip('By ' + r.Author, 'sec'));
   li.append(top, el('div', 't', clean(r.Item)));
   if (clean(r.About)) li.append(el('div', 'note', 'About: ' + clean(r.About)));
   if (clean(r.Details)) li.append(clampBox(clean(r.Details), 3, 'inbox:' + (r.url || r.Item), { cls: 'note' }));
@@ -447,6 +448,29 @@ function noteForm(about, aboutPage, kind) {
     button: kind === 'Question' ? 'Send to the next run' : 'Save note',
     make: (v) => (v.text && v.text.trim() ? { item: (kind === 'Question' ? 'Question: ' : 'Note: ') + v.text.trim().slice(0, 100), kind: kind || 'Note', about, aboutPage, details: v.text.trim() } : null),
     invalid: 'Write something first.',
+  });
+}
+/* ChatGPT's output, saved with ChatGPT as author: the runs treat it as a proposal to check, never as his decision. */
+const GPT_KIND = { 'Proposed setup': 'Proposed setup', 'Fact check': 'Verification', 'Research note': 'Note' };
+function chatgptForm() {
+  return inboxForm({
+    key: 'chatgpt', title: 'Paste from ChatGPT',
+    hint: 'Saved with ChatGPT as the author. The next pre-market run freezes a proposed setup as written or rejects it with a reason, and never changes a setup already frozen. A fact check is tested against the source it cites, and the row it concerns is regraded.',
+    grid: false,
+    fields: [
+      { id: 'kind', label: 'What it is', type: 'choice', choices: Object.keys(GPT_KIND), value: 'Proposed setup' },
+      { id: 'about', label: 'About: instrument, ticker, story or claim', type: 'text', wide: true },
+      { id: 'text', label: "ChatGPT's text, with its sources", type: 'textarea', wide: true },
+    ],
+    button: 'Save for the next run',
+    make: (v) => {
+      const text = (v.text || '').trim();
+      if (!text || !GPT_KIND[v.kind]) return null;
+      const about = (v.about || '').trim();
+      return { item: 'ChatGPT ' + v.kind.toLowerCase() + ': ' + (about || text).slice(0, 100), kind: GPT_KIND[v.kind], author: 'ChatGPT', about, details: text, content: text.length > 1900 ? text : '' };
+    },
+    invalid: "Paste ChatGPT's text first.",
+    toast: 'Saved as ChatGPT input for the next run.',
   });
 }
 /* Pick-then-confirm buttons for a decision. */

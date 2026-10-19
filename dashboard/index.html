@@ -826,6 +826,16 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
           <div id="inbox-list" class="pd-box dash-skeleton"></div>
         </section>
 
+        <section id="runs-card" class="pd-sec" aria-labelledby="runs-h">
+          <div class="pd-sec-head">
+            <div>
+              <h2 class="pd-h2" id="runs-h">How the runs went</h2>
+              <p class="pd-note">The last run of each scheduled task, from the Run Log, with what it could not do. A task with no record for its latest scheduled run is flagged.</p>
+            </div>
+          </div>
+          <div id="runs-list" class="pd-box dash-skeleton"></div>
+        </section>
+
         <section id="day-gate" class="pd-sec" aria-labelledby="gate-h">
           <div class="pd-sec-head">
             <div>
@@ -1351,6 +1361,7 @@ const VIEWS = {
   sectors: 'https://app.notion.com/p/b2f3233aa81443c39a5fa5db6b29c206?v=3fe161afda3881cabfc6000c78f6b746',
   themes: 'https://app.notion.com/p/f48bd34f9d4b41fdb4c2c8219cec3c6d?v=3fe161afda3881319f65000c08d1d407',
   inbox: 'https://app.notion.com/p/e1336be4e2354c48ac27255deba1e9ee?v=3fe161afda3881db84ae000cccd7fe0f',
+  runs: 'https://app.notion.com/p/85f00a13765f4881854f261c9424ad35?v=3fe161afda3881d094b7000cf4ba5cf4',
 };
 const PAGES = {
   collateral: 'https://app.notion.com/p/3f0161afda38813dad5eff184f819d25',
@@ -1526,7 +1537,7 @@ function defView(id) {
   const input = { data: { mode: 'view', view_url: VIEWS[id], page_size: 100 } };
   def(id, { tool: 'notion-query-data-sources', input, load: (p, c) => viewRows(p, c, input) });
 }
-['portfolio', 'ledger', 'lab', 'pulse', 'news', 'gauges', 'sectors', 'themes', 'inbox'].forEach(defView);
+['portfolio', 'ledger', 'lab', 'pulse', 'news', 'gauges', 'sectors', 'themes', 'inbox', 'runs'].forEach(defView);
 
 function pageBody(payload) {
   const a = asObj(payload);
@@ -1603,7 +1614,7 @@ def('brain_index', {
 /* ---- writes: one tool, one data source, only on a click ---- */
 async function inboxCreate(f) {
   if (!MCP) { const e = new Error('Notion is not reachable from this view.'); e.code = 'not_granted'; throw e; }
-  const props = { Item: String(f.item).slice(0, 180), Kind: f.kind, Status: 'New' };
+  const props = { Item: String(f.item).slice(0, 180), Kind: f.kind, Status: 'New', Author: f.author || 'Shashank' };
   if (f.about) props.About = String(f.about).slice(0, 1900);
   if (f.aboutPage && /^https:\/\//.test(f.aboutPage)) props['About page'] = f.aboutPage;
   if (f.decision) props.Decision = f.decision;
@@ -1657,7 +1668,7 @@ const LOG_TYPES = { 'Pre-market pulse': 0, 'Post-market review': 1, 'Weekly revi
 const LOG_PRI = { 'Weekly review': 0, 'Monthly IC': 0, 'Post-market review': 1, 'Pre-market pulse': 2 };
 const TABS = ['today', 'news', 'markets', 'portfolio', 'research', 'ideas', 'log', 'brain'];
 const TAB_OF = {
-  today: 'today', 'today-band': 'today', 'market-read': 'today', 'open-setups': 'today', 'day-gate': 'today', 'inbox-card': 'today', 'today-news': 'today',
+  today: 'today', 'today-band': 'today', 'market-read': 'today', 'open-setups': 'today', 'day-gate': 'today', 'inbox-card': 'today', 'runs-card': 'today', 'today-news': 'today',
   news: 'news', 'news-top': 'news', 'news-feed': 'news',
   markets: 'markets', 'gauges-sec': 'markets', 'corr-sec': 'markets', 'sector-sec': 'markets', 'macro-sec': 'markets',
   portfolio: 'portfolio', overview: 'portfolio', 'holdings-card': 'portfolio', 'watch-card': 'portfolio', 'collateral-card': 'portfolio', 'waiting-card': 'portfolio',
@@ -2704,6 +2715,7 @@ function inboxItem(r) {
   if (r.Decision) top.append(chip(r.Decision));
   top.append(chip(r.pending ? 'Saving' : STATUS_TEXT[r.Status] || r.Status || 'Waiting for a run', r.pending ? 'muted' : STATUS_TONE[r.Status] || ''));
   top.append(el('span', null, dayTimeStr(r.Created || r.createdTime)));
+  if (r.Author && r.Author !== 'Shashank') top.append(chip('By ' + r.Author, 'sec'));
   li.append(top, el('div', 't', clean(r.Item)));
   if (clean(r.About)) li.append(el('div', 'note', 'About: ' + clean(r.About)));
   if (clean(r.Details)) li.append(clampBox(clean(r.Details), 3, 'inbox:' + (r.url || r.Item), { cls: 'note' }));
@@ -2799,6 +2811,29 @@ function noteForm(about, aboutPage, kind) {
     invalid: 'Write something first.',
   });
 }
+/* ChatGPT's output, saved with ChatGPT as author: the runs treat it as a proposal to check, never as his decision. */
+const GPT_KIND = { 'Proposed setup': 'Proposed setup', 'Fact check': 'Verification', 'Research note': 'Note' };
+function chatgptForm() {
+  return inboxForm({
+    key: 'chatgpt', title: 'Paste from ChatGPT',
+    hint: 'Saved with ChatGPT as the author. The next pre-market run freezes a proposed setup as written or rejects it with a reason, and never changes a setup already frozen. A fact check is tested against the source it cites, and the row it concerns is regraded.',
+    grid: false,
+    fields: [
+      { id: 'kind', label: 'What it is', type: 'choice', choices: Object.keys(GPT_KIND), value: 'Proposed setup' },
+      { id: 'about', label: 'About: instrument, ticker, story or claim', type: 'text', wide: true },
+      { id: 'text', label: "ChatGPT's text, with its sources", type: 'textarea', wide: true },
+    ],
+    button: 'Save for the next run',
+    make: (v) => {
+      const text = (v.text || '').trim();
+      if (!text || !GPT_KIND[v.kind]) return null;
+      const about = (v.about || '').trim();
+      return { item: 'ChatGPT ' + v.kind.toLowerCase() + ': ' + (about || text).slice(0, 100), kind: GPT_KIND[v.kind], author: 'ChatGPT', about, details: text, content: text.length > 1900 ? text : '' };
+    },
+    invalid: "Paste ChatGPT's text first.",
+    toast: 'Saved as ChatGPT input for the next run.',
+  });
+}
 /* Pick-then-confirm buttons for a decision. */
 function decideRow(options, opts) {
   const wrap = el('div', 'pd-sheet-sec');
@@ -2865,7 +2900,7 @@ function openSetup(r, list) {
   const other = keys.filter((k) => !pre.includes(k) && !post.includes(k) && k !== 'Setup ID' && k !== 'Instrument');
   const strip = (k) => k.replace(/^(PRE|POST) /, '');
   openSheet({
-    kicker: [chip(id, 'muted'), r.Direction && chip(r.Direction, DIR_TONE(r.Direction)), r.Status && chip(r.Status, 'muted'), r.Market && chip(r.Market, 'sec')],
+    kicker: [chip(id, 'muted'), r.Direction && chip(r.Direction, DIR_TONE(r.Direction)), r.Status && chip(r.Status, 'muted'), r.Market && chip(r.Market, 'sec'), r.Author && chip('By ' + r.Author, 'sec')],
     title: firstSentence(clean(r.Instrument)) || id,
     nav: list ? { list, index: list.indexOf(r), open: openSetup } : null,
     build: (b) => {
@@ -2922,7 +2957,7 @@ function openSetup(r, list) {
 function openLab(r, list) {
   const isRej = r.Type === 'Rejected trade';
   openSheet({
-    kicker: [r.Type && chip(r.Type, 'muted'), !isRej && chip(r.Stage || 'Hypothesis'), r['date:Date:start'] && el('span', null, dayStr(r['date:Date:start']))],
+    kicker: [r.Type && chip(r.Type, 'muted'), !isRej && chip(r.Stage || 'Hypothesis'), r.Author && chip('By ' + r.Author, 'sec'), r['date:Date:start'] && el('span', null, dayStr(r['date:Date:start']))],
     title: clean(r.Name) || 'Untitled',
     nav: list ? { list, index: list.indexOf(r), open: openLab } : null,
     build: (b) => {
@@ -3314,7 +3349,7 @@ INIT_FNS.today = () => {
   initGate();
   clipPulse = clipper($('pulse-box'), $('pulse-toggle'));
   $('today-all-news').addEventListener('click', () => { show('news', true); window.scrollTo({ top: 0 }); });
-  $('inbox-new').addEventListener('click', () => openSheet({ kicker: [chip('Decisions Inbox', 'muted')], title: 'Add a note or question', build: (b) => { b.append(noteForm('General', ''), noteForm('General', '', 'Question')); } }));
+  $('inbox-new').addEventListener('click', () => openSheet({ kicker: [chip('Decisions Inbox', 'muted')], title: 'Add a note, a question or ChatGPT input', build: (b) => { b.append(noteForm('General', ''), noteForm('General', '', 'Question'), chatgptForm()); } }));
   $('pulse-ask').addEventListener('click', () => {
     const r = oneOf('latest_pulse');
     if (r) openAsk({ kind: 'Pre-market pulse', title: 'Pulse, ' + dayStr(r.Date), about: 'Pulse ' + dayStr(r.Date), url: r.url, text: () => rowText(r, ['Date', 'Headline', 'Regime', 'Setups proposed']) + '\n\n' + r.Body, suggestions: ['What matters most for my book today?', 'Where could this read be wrong?', 'Is there anything to do before the open?'] });
@@ -3816,6 +3851,16 @@ INIT_FNS.research = () => {
   $('days-more').addEventListener('click', () => { DAYS_N += 10; renderDays(); });
 };
 
+/* ===== Source quality and authorship ===== */
+const VER_TONE = { 'Primary verified': 'ok', 'Secondary only': 'warn', Unverified: 'bad' };
+/* Seed-edition rows were written from search summaries only, so an unmarked seed row is secondary. */
+const verOf = (r) => r.Verification || (r.Edition === 'Seed' ? 'Secondary only' : '');
+function verChip(r, long) {
+  const v = verOf(r);
+  if (!v) return chip(long ? 'Sources not graded' : 'Not graded', 'muted');
+  return chip(long ? 'Sources: ' + v.toLowerCase() : v, VER_TONE[v] || 'muted');
+}
+
 /* ===== News ===== */
 const SECTIONS = ['Top of the day', 'Holdings and watchlist', 'Politicians', 'Insiders and big investors', 'India macro', 'US macro', 'Rates and cross-asset', 'AI outlook', 'Emerging themes', 'Opportunities'];
 const NEWS = { sections: new Set(), market: 'all', mine: false, unread: false, n: 24 };
@@ -3841,6 +3886,7 @@ function newsCard(r, o) {
   const foot = el('div', 'foot');
   if (r.Impact) foot.append(chip(r.Impact, IMPACT_TONE[r.Impact] || 'muted'));
   if (r.Horizon) foot.append(chip(r.Horizon, 'muted'));
+  foot.append(verChip(r));
   tickersIn(r.Tickers).slice(0, 5).forEach((t) => foot.append(chip(t, 'tk' + (mine.has(t) ? ' own' : ''))));
   if (foot.children.length) b.append(foot);
   b.addEventListener('click', () => openNews(r, o.list));
@@ -3861,6 +3907,8 @@ function openNews(r, list) {
       if (r.Horizon) chips.append(chip('Horizon: ' + r.Horizon, 'muted'));
       if (r.Confidence) chips.append(chip('Confidence: ' + r.Confidence, 'muted'));
       if (num(r.Importance) !== null) chips.append(chip('Importance ' + num(r.Importance) + ' of 5', 'muted'));
+      chips.append(verChip(r, true));
+      if (r.Author) chips.append(chip('By ' + r.Author, 'sec'));
       tickersIn(r.Tickers).forEach((t) => {
         const own = mine.has(t);
         const c = el('button', 'pd-chip tk' + (own ? ' own' : ''), t);
@@ -4118,7 +4166,7 @@ function openGauge(x) {
       tw.append(t);
       w.append(tw);
       b.append(sec('Every snapshot', w));
-      if (last && clean(last.row.Sources)) b.append(sec('Sources for the latest snapshot', sourcesList(last.row.Sources)));
+      if (last) b.append(sec('Sources for the latest snapshot', verChip(last.row, true), clean(last.row.Sources) ? sourcesList(last.row.Sources) : empty('No sources recorded on this row.')));
       if (last && clean(last.row.Notes)) b.append(sec('Notes', el('p', 'pd-pre', clean(last.row.Notes))));
     },
   });
@@ -4341,6 +4389,7 @@ function themeCard(r, list) {
   if (r.Stage) meta.append(chip(r.Stage, r.Stage === 'Owned' ? 'ok' : 'muted'));
   if (r.Market) meta.append(chip(r.Market, 'sec'));
   if (r.Evidence) meta.append(chip('Evidence: ' + r.Evidence, r.Evidence === 'Speculative' ? 'warn' : 'muted'));
+  meta.append(verChip(r));
   b.append(meta, el('div', 'hl', clean(r.Theme)));
   const pot = el('div', 'pd-sheet-kicker');
   const mtr = el('span', 'pd-meter');
@@ -4355,7 +4404,7 @@ function themeCard(r, list) {
 }
 function openTheme(r, list) {
   openSheet({
-    kicker: [r.Stage && chip(r.Stage, 'muted'), r.Potential && chip(r.Potential + ' potential'), r.Market && chip(r.Market, 'sec'), r.Evidence && chip('Evidence: ' + r.Evidence, 'muted')],
+    kicker: [r.Stage && chip(r.Stage, 'muted'), r.Potential && chip(r.Potential + ' potential'), r.Market && chip(r.Market, 'sec'), r.Evidence && chip('Evidence: ' + r.Evidence, 'muted'), verChip(r, true), r.Author && chip('By ' + r.Author, 'sec')],
     title: clean(r.Theme),
     nav: list ? { list, index: list.indexOf(r), open: openTheme } : null,
     build: (b) => {
@@ -4551,6 +4600,80 @@ INIT_FNS.brain = () => {
   });
 };
 
+/* ===== Run health: the last run of each scheduled task ===== */
+const SCHED = [
+  { task: 'Markets news desk', days: [1, 2, 3, 4, 5, 6], h: 7, m: 37 },
+  { task: 'Pre-market pulse', days: [1, 2, 3, 4, 5], h: 8, m: 23 },
+  { task: 'Post-market review', days: [1, 2, 3, 4, 5], h: 16, m: 15 },
+  { task: 'Weekly review', days: [6], h: 9, m: 55 },
+  { task: 'Macro and themes', days: [0], h: 10, m: 41 },
+  { task: 'Monthly IC', monthly: true, h: 10, m: 52 },
+];
+/* Runs began writing to the Run Log on this day; earlier runs have no record to look for. */
+const RUNLOG_FROM = '2026-10-20';
+const RUN_TONE = { Complete: 'ok', Partial: 'warn', Failed: 'bad', Skipped: 'muted' };
+/* The day (IST) of the latest scheduled run that should have finished by now, allowing an hour. */
+function lastDue(s) {
+  const now = Date.now() + IST_MS;
+  const t = new Date(now);
+  for (let i = 0; i < 40; i++) {
+    const d = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate() - i));
+    if (s.monthly ? d.getUTCDate() !== 1 : !s.days.includes(d.getUTCDay())) continue;
+    if (d.getTime() + (s.h * 60 + s.m + 60) * 60000 <= now) return d.toISOString().slice(0, 10);
+  }
+  return '';
+}
+function openRun(r) {
+  openSheet({
+    kicker: [chip(r.Status || 'No status', RUN_TONE[r.Status] || 'muted'), r.Task && chip(r.Task, 'sec'), r.Author && chip('By ' + r.Author, 'sec'), verChip(r, true)],
+    title: clean(r.Run) || 'Run',
+    build: (b) => {
+      if (clean(r.Wrote)) b.append(sec('What it wrote', el('p', 'pd-pre', clean(r.Wrote))));
+      b.append(sec('What it could not do', clean(r.Missing) ? el('p', 'pd-pre', clean(r.Missing)) : empty('Nothing recorded as missing.')));
+    },
+  });
+}
+function runItem(r, flag) {
+  const li = el('li');
+  const top = el('div', 'top');
+  top.append(r ? chip(r.Status || 'No status', RUN_TONE[r.Status] || 'muted') : chip(flag.label, flag.tone));
+  if (r && r['date:Date:start']) top.append(el('span', null, weekday(r['date:Date:start']) + ' ' + dayStr(r['date:Date:start'])));
+  if (r) top.append(verChip(r));
+  li.append(top);
+  if (r) {
+    const t = el('button', 'pd-rowbtn t', clean(r.Run) || r.Task || 'Run');
+    t.type = 'button';
+    t.addEventListener('click', () => openRun(r));
+    li.append(t);
+  } else li.append(el('div', 't', flag.task));
+  if (flag && flag.text) li.append(el('div', 'note', flag.text));
+  if (r && clean(r.Missing)) li.append(clampBox(clean(r.Missing), 2, 'run:' + (r.url || r.Run), { cls: 'note' }));
+  return li;
+}
+function renderRuns() {
+  const box = $('runs-list');
+  if (!gateBox(box, stOf('runs'))) return;
+  const rows = rowsOf('runs').slice().sort((a, b) => cmp(a['date:Date:start'], b['date:Date:start'], 'desc') || cmp(a.createdTime, b.createdTime, 'desc'));
+  const ul = el('ul', 'pd-inbox');
+  SCHED.forEach((s) => {
+    const due = lastDue(s);
+    const latest = rows.find((r) => r.Task === s.task);
+    const onDue = rows.find((r) => r.Task === s.task && String(r['date:Date:start'] || '').slice(0, 10) === due);
+    if (onDue) ul.append(runItem(onDue));
+    else if (due && due >= RUNLOG_FROM) ul.append(runItem(null, { task: s.task, label: 'No record', tone: 'bad', text: (latest ? 'Last logged ' + dayStr(latest['date:Date:start']) + '. ' : '') + 'No record for ' + weekday(due) + ' ' + dayStr(due) + '. The run may have failed or may lack its Notion connector.' }));
+    else if (latest) ul.append(runItem(latest));
+    else ul.append(runItem(null, { task: s.task, label: 'Not logged yet', tone: 'muted', text: 'No Run Log record yet. Logging starts with its next run.' }));
+  });
+  const other = rows.filter((r) => !SCHED.some((s) => s.task === r.Task)).slice(0, 10);
+  const parts = [ul];
+  if (other.length) {
+    const ul2 = el('ul', 'pd-inbox');
+    ul2.append(...other.map((r) => runItem(r)));
+    parts.push(el('h3', 'pd-card-t', 'Research agents and checks'), ul2);
+  }
+  box.replaceChildren(...parts);
+}
+
 /* ===== Tabs ===== */
 const mounted = {};
 function revealTab(b) {
@@ -4608,7 +4731,7 @@ window.addEventListener('resize', () => { const w = $('pd-app').clientWidth; if 
 function render() {
   safe(renderHeader);
   safe(renderNewsBadge);
-  if (active === 'today') { safe(renderBand); safe(() => renderTopInto($('today-news-list'))); safe(renderRegime); safe(renderPulse); safe(renderOpenSetups); safe(renderInbox); }
+  if (active === 'today') { safe(renderBand); safe(() => renderTopInto($('today-news-list'))); safe(renderRegime); safe(renderPulse); safe(renderOpenSetups); safe(renderInbox); safe(renderRuns); }
   else if (active === 'news') safe(renderNews);
   else if (active === 'markets') { safe(renderGauges); safe(renderCorr); safe(renderSectors); safe(renderMacro); }
   else if (active === 'portfolio') { safe(renderAttn); safe(renderKpis); safe(renderThemes); safe(renderWaiting); safe(renderHoldings); safe(renderWatch); safe(renderCollateral); }

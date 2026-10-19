@@ -11,6 +11,7 @@ const VIEWS = {
   sectors: 'https://app.notion.com/p/b2f3233aa81443c39a5fa5db6b29c206?v=3fe161afda3881cabfc6000c78f6b746',
   themes: 'https://app.notion.com/p/f48bd34f9d4b41fdb4c2c8219cec3c6d?v=3fe161afda3881319f65000c08d1d407',
   inbox: 'https://app.notion.com/p/e1336be4e2354c48ac27255deba1e9ee?v=3fe161afda3881db84ae000cccd7fe0f',
+  runs: 'https://app.notion.com/p/85f00a13765f4881854f261c9424ad35?v=3fe161afda3881d094b7000cf4ba5cf4',
 };
 const PAGES = {
   collateral: 'https://app.notion.com/p/3f0161afda38813dad5eff184f819d25',
@@ -186,7 +187,7 @@ function defView(id) {
   const input = { data: { mode: 'view', view_url: VIEWS[id], page_size: 100 } };
   def(id, { tool: 'notion-query-data-sources', input, load: (p, c) => viewRows(p, c, input) });
 }
-['portfolio', 'ledger', 'lab', 'pulse', 'news', 'gauges', 'sectors', 'themes', 'inbox'].forEach(defView);
+['portfolio', 'ledger', 'lab', 'pulse', 'news', 'gauges', 'sectors', 'themes', 'inbox', 'runs'].forEach(defView);
 
 function pageBody(payload) {
   const a = asObj(payload);
@@ -263,7 +264,7 @@ def('brain_index', {
 /* ---- writes: one tool, one data source, only on a click ---- */
 async function inboxCreate(f) {
   if (!MCP) { const e = new Error('Notion is not reachable from this view.'); e.code = 'not_granted'; throw e; }
-  const props = { Item: String(f.item).slice(0, 180), Kind: f.kind, Status: 'New' };
+  const props = { Item: String(f.item).slice(0, 180), Kind: f.kind, Status: 'New', Author: f.author || 'Shashank' };
   if (f.about) props.About = String(f.about).slice(0, 1900);
   if (f.aboutPage && /^https:\/\//.test(f.aboutPage)) props['About page'] = f.aboutPage;
   if (f.decision) props.Decision = f.decision;

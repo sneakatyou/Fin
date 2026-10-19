@@ -261,6 +261,16 @@ INIT_FNS.research = () => {
   $('days-more').addEventListener('click', () => { DAYS_N += 10; renderDays(); });
 };
 
+/* ===== Source quality and authorship ===== */
+const VER_TONE = { 'Primary verified': 'ok', 'Secondary only': 'warn', Unverified: 'bad' };
+/* Seed-edition rows were written from search summaries only, so an unmarked seed row is secondary. */
+const verOf = (r) => r.Verification || (r.Edition === 'Seed' ? 'Secondary only' : '');
+function verChip(r, long) {
+  const v = verOf(r);
+  if (!v) return chip(long ? 'Sources not graded' : 'Not graded', 'muted');
+  return chip(long ? 'Sources: ' + v.toLowerCase() : v, VER_TONE[v] || 'muted');
+}
+
 /* ===== News ===== */
 const SECTIONS = ['Top of the day', 'Holdings and watchlist', 'Politicians', 'Insiders and big investors', 'India macro', 'US macro', 'Rates and cross-asset', 'AI outlook', 'Emerging themes', 'Opportunities'];
 const NEWS = { sections: new Set(), market: 'all', mine: false, unread: false, n: 24 };
@@ -286,6 +296,7 @@ function newsCard(r, o) {
   const foot = el('div', 'foot');
   if (r.Impact) foot.append(chip(r.Impact, IMPACT_TONE[r.Impact] || 'muted'));
   if (r.Horizon) foot.append(chip(r.Horizon, 'muted'));
+  foot.append(verChip(r));
   tickersIn(r.Tickers).slice(0, 5).forEach((t) => foot.append(chip(t, 'tk' + (mine.has(t) ? ' own' : ''))));
   if (foot.children.length) b.append(foot);
   b.addEventListener('click', () => openNews(r, o.list));
@@ -306,6 +317,8 @@ function openNews(r, list) {
       if (r.Horizon) chips.append(chip('Horizon: ' + r.Horizon, 'muted'));
       if (r.Confidence) chips.append(chip('Confidence: ' + r.Confidence, 'muted'));
       if (num(r.Importance) !== null) chips.append(chip('Importance ' + num(r.Importance) + ' of 5', 'muted'));
+      chips.append(verChip(r, true));
+      if (r.Author) chips.append(chip('By ' + r.Author, 'sec'));
       tickersIn(r.Tickers).forEach((t) => {
         const own = mine.has(t);
         const c = el('button', 'pd-chip tk' + (own ? ' own' : ''), t);
@@ -563,7 +576,7 @@ function openGauge(x) {
       tw.append(t);
       w.append(tw);
       b.append(sec('Every snapshot', w));
-      if (last && clean(last.row.Sources)) b.append(sec('Sources for the latest snapshot', sourcesList(last.row.Sources)));
+      if (last) b.append(sec('Sources for the latest snapshot', verChip(last.row, true), clean(last.row.Sources) ? sourcesList(last.row.Sources) : empty('No sources recorded on this row.')));
       if (last && clean(last.row.Notes)) b.append(sec('Notes', el('p', 'pd-pre', clean(last.row.Notes))));
     },
   });
@@ -786,6 +799,7 @@ function themeCard(r, list) {
   if (r.Stage) meta.append(chip(r.Stage, r.Stage === 'Owned' ? 'ok' : 'muted'));
   if (r.Market) meta.append(chip(r.Market, 'sec'));
   if (r.Evidence) meta.append(chip('Evidence: ' + r.Evidence, r.Evidence === 'Speculative' ? 'warn' : 'muted'));
+  meta.append(verChip(r));
   b.append(meta, el('div', 'hl', clean(r.Theme)));
   const pot = el('div', 'pd-sheet-kicker');
   const mtr = el('span', 'pd-meter');
@@ -800,7 +814,7 @@ function themeCard(r, list) {
 }
 function openTheme(r, list) {
   openSheet({
-    kicker: [r.Stage && chip(r.Stage, 'muted'), r.Potential && chip(r.Potential + ' potential'), r.Market && chip(r.Market, 'sec'), r.Evidence && chip('Evidence: ' + r.Evidence, 'muted')],
+    kicker: [r.Stage && chip(r.Stage, 'muted'), r.Potential && chip(r.Potential + ' potential'), r.Market && chip(r.Market, 'sec'), r.Evidence && chip('Evidence: ' + r.Evidence, 'muted'), verChip(r, true), r.Author && chip('By ' + r.Author, 'sec')],
     title: clean(r.Theme),
     nav: list ? { list, index: list.indexOf(r), open: openTheme } : null,
     build: (b) => {
@@ -996,6 +1010,80 @@ INIT_FNS.brain = () => {
   });
 };
 
+/* ===== Run health: the last run of each scheduled task ===== */
+const SCHED = [
+  { task: 'Markets news desk', days: [1, 2, 3, 4, 5, 6], h: 7, m: 37 },
+  { task: 'Pre-market pulse', days: [1, 2, 3, 4, 5], h: 8, m: 23 },
+  { task: 'Post-market review', days: [1, 2, 3, 4, 5], h: 16, m: 15 },
+  { task: 'Weekly review', days: [6], h: 9, m: 55 },
+  { task: 'Macro and themes', days: [0], h: 10, m: 41 },
+  { task: 'Monthly IC', monthly: true, h: 10, m: 52 },
+];
+/* Runs began writing to the Run Log on this day; earlier runs have no record to look for. */
+const RUNLOG_FROM = '2026-10-20';
+const RUN_TONE = { Complete: 'ok', Partial: 'warn', Failed: 'bad', Skipped: 'muted' };
+/* The day (IST) of the latest scheduled run that should have finished by now, allowing an hour. */
+function lastDue(s) {
+  const now = Date.now() + IST_MS;
+  const t = new Date(now);
+  for (let i = 0; i < 40; i++) {
+    const d = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate() - i));
+    if (s.monthly ? d.getUTCDate() !== 1 : !s.days.includes(d.getUTCDay())) continue;
+    if (d.getTime() + (s.h * 60 + s.m + 60) * 60000 <= now) return d.toISOString().slice(0, 10);
+  }
+  return '';
+}
+function openRun(r) {
+  openSheet({
+    kicker: [chip(r.Status || 'No status', RUN_TONE[r.Status] || 'muted'), r.Task && chip(r.Task, 'sec'), r.Author && chip('By ' + r.Author, 'sec'), verChip(r, true)],
+    title: clean(r.Run) || 'Run',
+    build: (b) => {
+      if (clean(r.Wrote)) b.append(sec('What it wrote', el('p', 'pd-pre', clean(r.Wrote))));
+      b.append(sec('What it could not do', clean(r.Missing) ? el('p', 'pd-pre', clean(r.Missing)) : empty('Nothing recorded as missing.')));
+    },
+  });
+}
+function runItem(r, flag) {
+  const li = el('li');
+  const top = el('div', 'top');
+  top.append(r ? chip(r.Status || 'No status', RUN_TONE[r.Status] || 'muted') : chip(flag.label, flag.tone));
+  if (r && r['date:Date:start']) top.append(el('span', null, weekday(r['date:Date:start']) + ' ' + dayStr(r['date:Date:start'])));
+  if (r) top.append(verChip(r));
+  li.append(top);
+  if (r) {
+    const t = el('button', 'pd-rowbtn t', clean(r.Run) || r.Task || 'Run');
+    t.type = 'button';
+    t.addEventListener('click', () => openRun(r));
+    li.append(t);
+  } else li.append(el('div', 't', flag.task));
+  if (flag && flag.text) li.append(el('div', 'note', flag.text));
+  if (r && clean(r.Missing)) li.append(clampBox(clean(r.Missing), 2, 'run:' + (r.url || r.Run), { cls: 'note' }));
+  return li;
+}
+function renderRuns() {
+  const box = $('runs-list');
+  if (!gateBox(box, stOf('runs'))) return;
+  const rows = rowsOf('runs').slice().sort((a, b) => cmp(a['date:Date:start'], b['date:Date:start'], 'desc') || cmp(a.createdTime, b.createdTime, 'desc'));
+  const ul = el('ul', 'pd-inbox');
+  SCHED.forEach((s) => {
+    const due = lastDue(s);
+    const latest = rows.find((r) => r.Task === s.task);
+    const onDue = rows.find((r) => r.Task === s.task && String(r['date:Date:start'] || '').slice(0, 10) === due);
+    if (onDue) ul.append(runItem(onDue));
+    else if (due && due >= RUNLOG_FROM) ul.append(runItem(null, { task: s.task, label: 'No record', tone: 'bad', text: (latest ? 'Last logged ' + dayStr(latest['date:Date:start']) + '. ' : '') + 'No record for ' + weekday(due) + ' ' + dayStr(due) + '. The run may have failed or may lack its Notion connector.' }));
+    else if (latest) ul.append(runItem(latest));
+    else ul.append(runItem(null, { task: s.task, label: 'Not logged yet', tone: 'muted', text: 'No Run Log record yet. Logging starts with its next run.' }));
+  });
+  const other = rows.filter((r) => !SCHED.some((s) => s.task === r.Task)).slice(0, 10);
+  const parts = [ul];
+  if (other.length) {
+    const ul2 = el('ul', 'pd-inbox');
+    ul2.append(...other.map((r) => runItem(r)));
+    parts.push(el('h3', 'pd-card-t', 'Research agents and checks'), ul2);
+  }
+  box.replaceChildren(...parts);
+}
+
 /* ===== Tabs ===== */
 const mounted = {};
 function revealTab(b) {
@@ -1053,7 +1141,7 @@ window.addEventListener('resize', () => { const w = $('pd-app').clientWidth; if 
 function render() {
   safe(renderHeader);
   safe(renderNewsBadge);
-  if (active === 'today') { safe(renderBand); safe(() => renderTopInto($('today-news-list'))); safe(renderRegime); safe(renderPulse); safe(renderOpenSetups); safe(renderInbox); }
+  if (active === 'today') { safe(renderBand); safe(() => renderTopInto($('today-news-list'))); safe(renderRegime); safe(renderPulse); safe(renderOpenSetups); safe(renderInbox); safe(renderRuns); }
   else if (active === 'news') safe(renderNews);
   else if (active === 'markets') { safe(renderGauges); safe(renderCorr); safe(renderSectors); safe(renderMacro); }
   else if (active === 'portfolio') { safe(renderAttn); safe(renderKpis); safe(renderThemes); safe(renderWaiting); safe(renderHoldings); safe(renderWatch); safe(renderCollateral); }

@@ -10,7 +10,7 @@ function openSetup(r, list) {
   const other = keys.filter((k) => !pre.includes(k) && !post.includes(k) && k !== 'Setup ID' && k !== 'Instrument');
   const strip = (k) => k.replace(/^(PRE|POST) /, '');
   openSheet({
-    kicker: [chip(id, 'muted'), r.Direction && chip(r.Direction, DIR_TONE(r.Direction)), r.Status && chip(r.Status, 'muted'), r.Market && chip(r.Market, 'sec')],
+    kicker: [chip(id, 'muted'), r.Direction && chip(r.Direction, DIR_TONE(r.Direction)), r.Status && chip(r.Status, 'muted'), r.Market && chip(r.Market, 'sec'), r.Author && chip('By ' + r.Author, 'sec')],
     title: firstSentence(clean(r.Instrument)) || id,
     nav: list ? { list, index: list.indexOf(r), open: openSetup } : null,
     build: (b) => {
@@ -67,7 +67,7 @@ function openSetup(r, list) {
 function openLab(r, list) {
   const isRej = r.Type === 'Rejected trade';
   openSheet({
-    kicker: [r.Type && chip(r.Type, 'muted'), !isRej && chip(r.Stage || 'Hypothesis'), r['date:Date:start'] && el('span', null, dayStr(r['date:Date:start']))],
+    kicker: [r.Type && chip(r.Type, 'muted'), !isRej && chip(r.Stage || 'Hypothesis'), r.Author && chip('By ' + r.Author, 'sec'), r['date:Date:start'] && el('span', null, dayStr(r['date:Date:start']))],
     title: clean(r.Name) || 'Untitled',
     nav: list ? { list, index: list.indexOf(r), open: openLab } : null,
     build: (b) => {
@@ -459,7 +459,7 @@ INIT_FNS.today = () => {
   initGate();
   clipPulse = clipper($('pulse-box'), $('pulse-toggle'));
   $('today-all-news').addEventListener('click', () => { show('news', true); window.scrollTo({ top: 0 }); });
-  $('inbox-new').addEventListener('click', () => openSheet({ kicker: [chip('Decisions Inbox', 'muted')], title: 'Add a note or question', build: (b) => { b.append(noteForm('General', ''), noteForm('General', '', 'Question')); } }));
+  $('inbox-new').addEventListener('click', () => openSheet({ kicker: [chip('Decisions Inbox', 'muted')], title: 'Add a note, a question or ChatGPT input', build: (b) => { b.append(noteForm('General', ''), noteForm('General', '', 'Question'), chatgptForm()); } }));
   $('pulse-ask').addEventListener('click', () => {
     const r = oneOf('latest_pulse');
     if (r) openAsk({ kind: 'Pre-market pulse', title: 'Pulse, ' + dayStr(r.Date), about: 'Pulse ' + dayStr(r.Date), url: r.url, text: () => rowText(r, ['Date', 'Headline', 'Regime', 'Setups proposed']) + '\n\n' + r.Body, suggestions: ['What matters most for my book today?', 'Where could this read be wrong?', 'Is there anything to do before the open?'] });

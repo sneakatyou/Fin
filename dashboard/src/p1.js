@@ -20,7 +20,7 @@ const LOG_TYPES = { 'Pre-market pulse': 0, 'Post-market review': 1, 'Weekly revi
 const LOG_PRI = { 'Weekly review': 0, 'Monthly IC': 0, 'Post-market review': 1, 'Pre-market pulse': 2 };
 const TABS = ['today', 'news', 'markets', 'portfolio', 'research', 'ideas', 'log', 'brain'];
 const TAB_OF = {
-  today: 'today', 'today-band': 'today', 'market-read': 'today', 'open-setups': 'today', 'day-gate': 'today', 'inbox-card': 'today', 'today-news': 'today',
+  today: 'today', 'today-band': 'today', 'market-read': 'today', 'open-setups': 'today', 'day-gate': 'today', 'inbox-card': 'today', 'runs-card': 'today', 'today-news': 'today',
   news: 'news', 'news-top': 'news', 'news-feed': 'news',
   markets: 'markets', 'gauges-sec': 'markets', 'corr-sec': 'markets', 'sector-sec': 'markets', 'macro-sec': 'markets',
   portfolio: 'portfolio', overview: 'portfolio', 'holdings-card': 'portfolio', 'watch-card': 'portfolio', 'collateral-card': 'portfolio', 'waiting-card': 'portfolio',
