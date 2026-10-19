@@ -886,7 +886,7 @@ INIT_FNS.ideas = () => {
     renderRadar();
   });
   initCalcs();
-  $('money-ask').addEventListener('click', () => openAsk({ kind: 'Mutual funds note', title: 'My mutual funds', about: 'Mutual funds', url: PAGES.money, text: () => 'He says: about Rs 8.5 lakh in mutual funds, held 4 to 5 years, "at 13%", feels it is not growing and is thinking of getting out. Fund names, plan type (regular or direct) and whether 13% is total or yearly are not known yet.\n\nThe Money moves note:\n' + ((pageData(PAGES.money).data[0] || {}).Body || ''), suggestions: ['Should I exit, switch or stay? Walk me through the decision.', 'What do I need to find out about my funds first?', 'How would the tax work if I switch this year?'] }));
+  $('money-ask').addEventListener('click', () => openAsk({ kind: 'Mutual funds note', title: 'My mutual funds', about: 'Mutual funds', url: PAGES.money, text: () => 'His mutual funds on 19 Oct 2026 (from his app): invested Rs 6,92,465; current value Rs 8,41,621; total gain Rs 1,49,156 (21.53%); current XIRR 8.83% on holdings now; lifetime XIRR 7.38% including past redemptions. Held over about 4 to 5 years; he feels they are not growing and is thinking of getting out. Fund names, plan type (regular or direct), how much was bought in the last 12 months and whether any units are pledged are not known yet.\n\nThe Money moves note:\n' + ((pageData(PAGES.money).data[0] || {}).Body || ''), suggestions: ['Should I exit, switch or stay? Walk me through the decision.', 'What do I need to find out about my funds first?', 'How would the tax work if I switch this year?'] }));
 };
 
 /* ===== Log ===== */

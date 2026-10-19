@@ -1232,7 +1232,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
             <div class="pd-calc" id="calc-cagr">
               <h3>What your return is per year</h3>
               <div class="pd-fields">
-                <div class="pd-field"><label for="cagr-gain">Total gain %</label><input id="cagr-gain" class="pd-input" type="number" inputmode="decimal" step="any" value="13"></div>
+                <div class="pd-field"><label for="cagr-gain">Total gain %</label><input id="cagr-gain" class="pd-input" type="number" inputmode="decimal" step="any" value="21.53"></div>
                 <div class="pd-field"><label for="cagr-years">Years held</label><input id="cagr-years" class="pd-input" type="number" inputmode="decimal" step="any" value="5"></div>
               </div>
               <div class="res" role="status" aria-live="polite"><span class="big" id="cagr-out">—</span><p id="cagr-note"></p></div>
@@ -1240,7 +1240,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
             <div class="pd-calc" id="calc-drag">
               <h3>What fund costs take over time</h3>
               <div class="pd-fields">
-                <div class="pd-field"><label for="drag-amt">Amount (₹)</label><input id="drag-amt" class="pd-input" type="number" inputmode="decimal" step="any" value="850000"></div>
+                <div class="pd-field"><label for="drag-amt">Amount (₹)</label><input id="drag-amt" class="pd-input" type="number" inputmode="decimal" step="any" value="841621"></div>
                 <div class="pd-field"><label for="drag-ret">Return before costs %/yr</label><input id="drag-ret" class="pd-input" type="number" inputmode="decimal" step="any" value="11"></div>
                 <div class="pd-field"><label for="drag-gap">Extra yearly cost %</label><input id="drag-gap" class="pd-input" type="number" inputmode="decimal" step="any" value="0.8"></div>
                 <div class="pd-field"><label for="drag-yrs">Years</label><input id="drag-yrs" class="pd-input" type="number" inputmode="decimal" step="any" value="10"></div>
@@ -1250,7 +1250,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
             <div class="pd-calc" id="calc-tax">
               <h3>Tax if you redeem equity funds</h3>
               <div class="pd-fields">
-                <div class="pd-field"><label for="tax-gain">Gain held over a year (₹)</label><input id="tax-gain" class="pd-input" type="number" inputmode="decimal" step="any" value="98000"></div>
+                <div class="pd-field"><label for="tax-gain">Gain held over a year (₹)</label><input id="tax-gain" class="pd-input" type="number" inputmode="decimal" step="any" value="149156"></div>
                 <div class="pd-field"><label for="tax-st">Gain held a year or less (₹)</label><input id="tax-st" class="pd-input" type="number" inputmode="decimal" step="any" value="0"></div>
                 <div class="pd-field"><label for="tax-ltcg">Long-term rate %</label><input id="tax-ltcg" class="pd-input" type="number" inputmode="decimal" step="any" value="12.5"></div>
                 <div class="pd-field"><label for="tax-ex">Yearly exemption (₹)</label><input id="tax-ex" class="pd-input" type="number" inputmode="decimal" step="any" value="125000"></div>
@@ -1259,7 +1259,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
               <div class="res" role="status" aria-live="polite"><span class="big" id="tax-out">—</span><p id="tax-note"></p></div>
             </div>
           </div>
-          <p class="pd-note">Defaults: about ₹8.5 lakh, a 13% total gain over 5 years, and the equity-fund tax rules from the July 2024 Budget (12.5% above ₹1.25 lakh a year long-term, 20% short-term; cess and surcharge not included). Check the rates in the note below before acting; they change.</p>
+          <p class="pd-note">Defaults: your funds on 19 Oct 2026 (₹6.92 lakh invested, ₹8.42 lakh now, a ₹1.49 lakh or 21.5% gain; your app puts the XIRR at 8.83%, the fair yearly figure for SIPs), and the equity-fund tax rules from the July 2024 Budget (12.5% above ₹1.25 lakh a year long-term, 20% short-term; cess and surcharge not included). Check the rates in the note below before acting; they change.</p>
           <article class="pd-article" aria-labelledby="money-title">
             <nav id="money-toc" class="pd-toc" aria-label="On this page" hidden></nav>
             <div id="money-body" class="pd-box nr dash-skeleton"></div>
@@ -4441,7 +4441,7 @@ INIT_FNS.ideas = () => {
     renderRadar();
   });
   initCalcs();
-  $('money-ask').addEventListener('click', () => openAsk({ kind: 'Mutual funds note', title: 'My mutual funds', about: 'Mutual funds', url: PAGES.money, text: () => 'He says: about Rs 8.5 lakh in mutual funds, held 4 to 5 years, "at 13%", feels it is not growing and is thinking of getting out. Fund names, plan type (regular or direct) and whether 13% is total or yearly are not known yet.\n\nThe Money moves note:\n' + ((pageData(PAGES.money).data[0] || {}).Body || ''), suggestions: ['Should I exit, switch or stay? Walk me through the decision.', 'What do I need to find out about my funds first?', 'How would the tax work if I switch this year?'] }));
+  $('money-ask').addEventListener('click', () => openAsk({ kind: 'Mutual funds note', title: 'My mutual funds', about: 'Mutual funds', url: PAGES.money, text: () => 'His mutual funds on 19 Oct 2026 (from his app): invested Rs 6,92,465; current value Rs 8,41,621; total gain Rs 1,49,156 (21.53%); current XIRR 8.83% on holdings now; lifetime XIRR 7.38% including past redemptions. Held over about 4 to 5 years; he feels they are not growing and is thinking of getting out. Fund names, plan type (regular or direct), how much was bought in the last 12 months and whether any units are pledged are not known yet.\n\nThe Money moves note:\n' + ((pageData(PAGES.money).data[0] || {}).Body || ''), suggestions: ['Should I exit, switch or stay? Walk me through the decision.', 'What do I need to find out about my funds first?', 'How would the tax work if I switch this year?'] }));
 };
 
 /* ===== Log ===== */
